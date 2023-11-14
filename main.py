@@ -37,7 +37,8 @@ except ImportError:
 
 import adafruit_vl53l1x  # "Time of flight", i.e., distance sensor
 import adafruit_lis3dh  # accelerometer
-from adafruit_seesaw import seesaw, rotaryio, digitalio  # Adafruit ANO Rotary Encoder
+
+# from adafruit_seesaw import seesaw, rotaryio, digitalio  # Adafruit ANO Rotary Encoder
 from adafruit_motor import servo
 
 
@@ -115,8 +116,9 @@ external_power.switch_to_output(value=not sleeping)
 # i2c = busio.I2C(board.SCL1, board.SDA1) # for QT Py RP2040
 # i2c = board.I2C()  # uses board.SCL and board.SDA
 i2c = board.STEMMA_I2C()  # Use built-in STEMMA QT connector on RP2040
-seesaw = seesaw.Seesaw(i2c, addr=0x49)
+# seesaw = seesaw.Seesaw(i2c, addr=0x49)
 
+"""
 seesaw_product = (seesaw.get_version() >> 16) & 0xFFFF
 if verbose:
     print(f"Found product {seesaw_product}")
@@ -143,7 +145,7 @@ last_position = None
 buttons = [select, up, left, down, right]
 button_names = ["Select", "Up", "Left", "Down", "Right"]
 button_states = [select_held, up_held, left_held, down_held, right_held]
-
+"""
 
 #################################################
 # External button
@@ -531,6 +533,7 @@ while True:
 
                 # -----------------
                 # Check buttons/switches
+                """
                 position = encoder.position
                 if position != last_position:
                     last_position = position
@@ -545,6 +548,7 @@ while True:
                         button_states[b] = False
                         if verbose:
                             print(f"{button_names[b]} button released")
+                """
 
                 if play_arpy:
                     key = randrange(4)
