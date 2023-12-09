@@ -5,6 +5,7 @@
 # https://www.adafruit.com/product/5768
 # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather
 
+# region Libraries
 # TODO: https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup
 
 import time, board  # , analogio, keypad
@@ -19,8 +20,9 @@ from audiocore import RawSample
 import audiocore  # for WAV files
 import audiobusio  # for I2S audio with external I2S DAC board
 import audiomixer
-import pwmio, audiopwmio, synthio
-from audiomp3 import MP3Decoder
+import pwmio, audiopwmio, synthio, simpleio, audiomp3
+
+# from audiomp3 import MP3Decoder
 
 # import digitalio
 from digitalio import DigitalInOut, Pull
@@ -75,6 +77,7 @@ Colors defined by Adafruit Led Animation library:
 # import another_file
 # from another_file import *
 
+# endregion
 
 sound_dir = "sounds/"
 mp3files = [
@@ -88,7 +91,10 @@ mp3files = [
 verbose = True  # print out debug information to serial port?
 # verbose = False   # print out debug information to serial port?
 
-NUM_VOICES = 3  # how many voices for each note
+################################################
+# region Arpeggio: Arpy (broken or rolling chord: notes of a chord individually &
+# quickly sounded in a progressive rising or descending order)
+NUM_ARPY_VOICES = 3  # how many voices for each note
 lpf_basef = 2500  # filter lowest frequency
 lpf_resonance = 1.5  # filter q
 
@@ -98,7 +104,7 @@ lpf_resonance = 1.5  # filter q
 analog_max = 65535  # Max knob value... 2**16-1
 # https://docs.circuitpython.org/en/latest/shared-bindings/analogio/#analogio.AnalogIn
 led = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.1)
-
+# endregion
 
 #################################################
 # provide power to the external components
@@ -110,13 +116,15 @@ external_power.switch_to_output(value=not sleeping)
 
 
 #################################################
-# Enable rotary encoder (or other button/switch)
+# region Enable rotary encoder (or other button/switch)
 # https://www.adafruit.com/product/5740
 
 # i2c = busio.I2C(board.SCL1, board.SDA1) # for QT Py RP2040
 # i2c = board.I2C()  # uses board.SCL and board.SDA
 i2c = board.STEMMA_I2C()  # Use built-in STEMMA QT connector on RP2040
 # seesaw = seesaw.Seesaw(i2c, addr=0x49)
+# endregion
+
 
 """
 seesaw_product = (seesaw.get_version() >> 16) & 0xFFFF
@@ -161,7 +169,7 @@ button_states = [select_held, up_held, left_held, down_held, right_held]
 
 
 #################################################
-# Time of Flight - i.e., distance measurement
+# region Time of Flight - i.e., distance measurement
 # https://learn.adafruit.com/adafruit-vl53l1x
 vl53 = adafruit_vl53l1x.VL53L1X(i2c)
 vl53.distance_mode = 1
@@ -185,18 +193,18 @@ if verbose:
     print("--------------------")
 
 vl53.start_ranging()
-
+# endregion
 
 #################################################
-# Enable servo motor
+# region Enable servo motor
 pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2**15, frequency=50)
 prop_servo = servo.Servo(pwm)
 angle = 0
 angle_plus = True
-
+# endregion
 
 #################################################
-# External neopixels
+# region External neopixels
 # https://learn.adafruit.com/circuitpython-led-animations
 # https://learn.adafruit.com/adafruit-neopixel-uberguide
 # https://learn.adafruit.com/adafruit-neopixel-uberguide/neomatrix-library
@@ -251,10 +259,10 @@ animations = AnimationSequence(
     advance_interval=5,
     random_order=True,
 )
-
+# endregion
 
 #################################################
-# onboard i2c LIS3DH accelerometer
+# region Onboard i2c LIS3DH accelerometer
 # https://learn.adafruit.com/adafruit-lis3dh-triple-axis-accelerometer-breakout
 i2c = board.I2C()
 int1 = DigitalInOut(board.ACCELEROMETER_INTERRUPT)
@@ -263,10 +271,10 @@ lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
 lis3dh.range = adafruit_lis3dh.RANGE_2_G
 # https://learn.adafruit.com/adafruit-lis3dh-triple-axis-accelerometer-breakout/arduino#tap-and-double-tap-detection-1729254
 lis3dh.set_tap(1, 100)  # set_tap(2, THRESHOLD) looks for double taps
-
+# endregion
 
 #################################################
-# Music & Audio...
+# region Music & Audio...
 # https://github.com/todbot/circuitpython-tricks#audio
 
 # i2s audio playback on PropMaker Feather RP2040
@@ -283,24 +291,43 @@ audio = audiobusio.I2SOut(
 mixer = audiomixer.Mixer(
     voice_count=2,
     channel_count=1,
-    sample_rate=8000,
-    buffer_size=2048,
+    sample_rate=22050,  # 8000,
+    #    buffer_size=2048,
     bits_per_sample=16,
-    samples_signed=False,
+    samples_signed=True,  # False,
 )
 # mixer = audiomixer.Mixer(channel_count=2, sample_rate=22050, buffer_size=2048)
-# audio.play(mixer)     #   , loop=True
+audio.play(mixer)  #   , loop=True # attach mixer to audio playback
 # time.sleep(1)
 # audio.stop()
+
+wav_file2 = "sounds/amenfull_22k_s16.wav"  # in 'circuitpython-tricks/larger-tricks/breakbeat_wavs'
+mp3_file2 = (
+    "sounds/One_Day-22Hz-16kbpsConst.mp3"  # in 'circuitpython-tricks/larger-tricks/wav'
+)
+# https://freesound.org/people/f-r-a-g-i-l-e/sounds/476663/
+
+wave = audiocore.WaveFile(open(wav_file2, "rb"))
+mp3 = audiomp3.MP3Decoder(open(mp3_file2, "rb"))
+mixer.voice[0].play(wave)
+mixer.voice[0].level = 0.4
+mixer.voice[1].play(mp3)
+mixer.voice[1].level = 0.2
 
 play_arpy = False
 
 if True:
+    for f in (262, 294, 330, 349, 392, 440, 494, 523):
+        if verbose:
+            print("play ", f, " MHz tone...")
+        # simpleio.tone(board.SPEAKER, f, 0.25)
+        time.sleep(0.5)
+
     # ######## Get MP3 file
     # https://github.com/todbot/circuitpython-tricks#playing-mp3-files
     # You have to specify some mp3 file when creating the decoder
     mp3_file = open(sound_dir + mp3files[0], "rb")
-    mp3_stream = MP3Decoder(mp3_file)  # Create object only once to save memory
+    mp3_stream = audiomp3.MP3Decoder(mp3_file)  # Create object only once to save memory
     if verbose:
         bps = mp3_stream.bits_per_sample  # 16
         sr = mp3_stream.sample_rate  # 44100
@@ -338,9 +365,10 @@ if True:
 
     ##### Get Midi file
     # https://bitmidi.com/, https://midisfree.com, https://musiclab.chromeexperiments.com/Song-Maker/,
-    data = open(sound_dir + "lonely.mid", "rb")
-    midi = synthio.from_file(data)
-    if verbose:
+
+    # data = open(sound_dir + "lonely.mid", "rb")
+    # midi = synthio.from_file(data)
+    if False:  # verbose:
         bps = "undefined"  # midi.bits_per_sample
         sr = midi.sample_rate  # 11025
         print("midi file bps:", bps, " sample rate:", sr)
@@ -377,11 +405,11 @@ if True:
         # mixer.music.play(-1)  # will cause song to loop
 
     ########## Play some of the above...
-    if True:
-        audio.play(mixer)
+    if False:
+        # audio.play(mixer)
 
         """
-        mixer.voice[0].play(synth)  # requires mixer samples_signed=True 
+        mixer.voice[0].play(synth)  # requires mixer samples_signed=True
         mixer.voice[0].level = 0.4
         if verbose: print("Mixer voice 0 playing...")
         time.sleep(1)
@@ -423,7 +451,7 @@ elif play_arpy:
         led.fill(rainbowio.colorwheel(n % 12 * 20))
         fo = synthio.midi_to_hz(n)
         voices.clear()  # delete any old voices
-        for i in range(NUM_VOICES):
+        for i in range(NUM_ARPY_VOICES):
             f = fo * (1 + i * 0.007)
             lpf_f = fo * 8  # a kind of key tracking
             lpf = synth.low_pass_filter(lpf_f, lpf_resonance)
@@ -456,20 +484,29 @@ elif play_arpy:
     arpy.set_transpose(distance=12, steps=0)
 
     knobfilter = 0.75
-    knobAval = 10000  # knobA.value
-    knobBval = 10000  # knobB.value
+    knobA_value = 10000  # knobA.value
+    knobB_value = 10000  # knobB.value
 
 else:
     # synthio_eighties_dystopia.py based code...
     print("no op")
 
+knobfilter = 0.75
+knobA_value = 10000  # knobA.value
+knobB_value = 10000  # knobB.value
+# endregion
 
 #################################################
 loop = 0
+loop_inner = 0
 mailbox_lid_open = False
 history = [0, 0, 0, 0, 0]
 
 while True:
+    loop += 1
+    if verbose and (not loop % 100):
+        print("Loop count: ", loop)
+
     for filename in mp3files:
         """
         rndfilename = mp3files[randrange(len(mp3files))]
@@ -488,25 +525,28 @@ while True:
         #################################################
         # This allows you to do other things while the audio plays!
         while True:  # audio.playing:
-            loop += 1
-            if verbose and (not loop % 100):
-                print("Loop count: ", loop)
+            loop_inner += 1
+            if verbose and (not loop_inner % 100):
+                print("Inner Loop count: ", loop_inner)
 
             # -----------------
-            # Measure distance
-            if vl53.data_ready and (not loop % 5):
+            # region Measure distance
+            if vl53.data_ready and (not loop_inner % 25):
                 if verbose:
                     print("Distance: {} cm".format(vl53.distance))
                 vl53.clear_interrupt()
+            # endregion
 
             # -----------------
-            # read and print LIS3DH values
+            # region Read and print LIS3DH values
             x, y, z = [
                 value / adafruit_lis3dh.STANDARD_GRAVITY
                 for value in lis3dh.acceleration
             ]
-            if verbose and (not loop % 5):
-                print(f"x = {x:.3f} G, y = {y:.3f} G, z = {z:.3f} G (loop:{loop})")
+            if verbose and (not loop_inner % 25):
+                print(
+                    f"x = {x:.3f} G, y = {y:.3f} G, z = {z:.3f} G (loop:{loop_inner})"
+                )
 
             if verbose and lis3dh.tapped:
                 print("Tapped!")
@@ -514,6 +554,7 @@ while True:
                 shake_threshold=12
             ):  # default of 30 is too high
                 print("Shaken!")
+            # endregion
 
             # Above code always runs
             # Code below only runs if mailbox lid is opened, in order to save battery power
@@ -532,7 +573,7 @@ while True:
                 # Mailbox is being used!!!
 
                 # -----------------
-                # Check buttons/switches
+                # region Check buttons/switches
                 """
                 position = encoder.position
                 if position != last_position:
@@ -549,6 +590,7 @@ while True:
                         if verbose:
                             print(f"{button_names[b]} button released")
                 """
+                # endregion
 
                 if play_arpy:
                     key = randrange(4)
@@ -571,14 +613,18 @@ while True:
 
                     knobA_value = randrange(analog_max)
                     knobB_value = randrange(analog_max)
-                    knobAval = 1
-                    knobAval = knobAval * knobfilter + (1 - knobfilter) * knobA_value
-                    knobBval = knobBval * knobfilter + (1 - knobfilter) * knobB_value
+                    # knobA_value = 1
+                    knobA_value = (
+                        knobA_value * knobfilter + (1 - knobfilter) * knobA_value
+                    )
+                    knobB_value = (
+                        knobB_value * knobfilter + (1 - knobfilter) * knobB_value
+                    )
 
                     # map knobA to root note
-                    arpy.root_note = int(map_range(knobAval, 0, 65535, 24, 72))
+                    arpy.root_note = int(map_range(knobA_value, 0, 65535, 24, 72))
                     # map knobB to bpm
-                    arpy.set_bpm(map_range(knobBval, 0, 65535, 40, 180))
+                    arpy.set_bpm(map_range(knobB_value, 0, 65535, 40, 180))
 
                     arpy.update()
                     time.sleep(3)
@@ -605,7 +651,7 @@ while True:
                 """
 
                 # -----------------
-                # modify external neopixel animation based on switches?
+                # region Modify external neopixel animation based on switches?
                 # How to make responsive animations???
                 # https://docs.circuitpython.org/projects/led-animation/en/latest/api.html#adafruit_led_animation.animation.Animation
 
@@ -629,9 +675,10 @@ while True:
 
                 # advance_interval=2,
                 # speed = 2)
+                # endregion
 
                 # -----------------
-                # move servo back and forth
+                # region Move servo back and forth
                 prop_servo.angle = angle
                 if angle_plus:
                     angle += 5
@@ -641,9 +688,10 @@ while True:
                     angle_plus = False
                 elif angle == 0:
                     angle_plus = True
+                # endregion
 
             # time.sleep(.05)
-            pass
+            # pass
 
         # print("Waiting for button press to continue!")
         # while button.value:

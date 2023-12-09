@@ -65,6 +65,17 @@ like any other app.
 
 - Check out <contributing.md>
 
+### Color Optionss
+
+Colors defined by Adafruit Led Animation library Amber, Aqua, Blue, Cyan, Gold, Green,
+Jade, Magenta, Old lace, Orange, Pink, Purple, Red, Teal, White, Yellow
+
+Old lace = warm white Black or off RAINBOW is a list of colors to use for cycling through
+Includes, in order: red, orange, yellow, green, blue, and purple RGBW_WHITE_RGB is for
+RGBW strips to illuminate only the RGB diodes RGBW_WHITE_RGBW is for RGBW strips to
+illuminate the RGB and White diodes RGBW_WHITE_W is for RGBW strips to illuminate only
+White diode
+
 ### To update documentation
 
 `npm run compodoc` to regenerate the doc. `compodoc -s` to serve/view the doc at
