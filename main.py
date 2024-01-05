@@ -197,7 +197,7 @@ vl53.start_ranging()
 
 #################################################
 # region Enable servo motor
-pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2**15, frequency=50)
+pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2 ** 15, frequency=50)
 prop_servo = servo.Servo(pwm)
 angle = 0
 angle_plus = True
@@ -388,13 +388,13 @@ if True:
 
     ####### Create sine wave sample
     # https://github.com/todbot/circuitpython-tricks#making-simple-tones
-    tone_volume = 0.1  # Increase this to increase the volume of the tone.
+    TONE_VOLUME = 0.1  # Increase this to increase the volume of the tone.
     frequency = 440  # Set this to the Hz of the tone you want to generate.
     length = 1000 // frequency
     sine_wave = array.array("H", [0] * length)
     for i in range(length):
         sine_wave[i] = int(
-            (1 + math.sin(math.pi * 2 * i / length)) * tone_volume * (2**15 - 1)
+            (1 + math.sin(math.pi * 2 * i / length)) * TONE_VOLUME * (2 ** 15 - 1)
         )
     sine_wave_sample = RawSample(sine_wave)
     if verbose:
@@ -500,7 +500,9 @@ knobB_value = 10000  # knobB.value
 loop = 0
 loop_inner = 0
 mailbox_lid_open = False
-history = [0, 0, 0, 0, 0]
+STEPS = 250  # @ 1/ms => .25 sec
+# history = 0 # [0, 0, 0]
+x = 0
 
 while True:
     loop += 1
@@ -539,14 +541,39 @@ while True:
 
             # -----------------
             # region Read and print LIS3DH values
+            history = x
             x, y, z = [
                 value / adafruit_lis3dh.STANDARD_GRAVITY
                 for value in lis3dh.acceleration
             ]
-            if verbose and (not loop_inner % 25):
-                print(
-                    f"x = {x:.3f} G, y = {y:.3f} G, z = {z:.3f} G (loop:{loop_inner})"
-                )
+            # print("(", x, ", ", y, ", ", z, ")")
+            # right side down = increasing X
+            # top down ((i.e., mailbox lid open) y ~= 0, closed lid (top up) y ~= -0.9
+            # z up to 2 & down to -1??? up for raising, down for lowering
+            # print("(", z, ")")
+            # history.push(x)
+            if x == 0:
+                x = 0.000001
+            rel_chg = ((x - history) / x) * 100
+            # if x == history:
+                # print("Same ", rel_chg)
+            # elif x > history:
+                # print("Increasing ", rel_chg)
+            # else:
+                # print("Descreasing ", rel_chg)
+            history = x
+
+            # if verbose and (not loop_inner % 25):
+                # f"x = {x:.3f} G, y = {y:.3f} G, z = {z:.3f} G (loop:{loop_inner})"
+                # print("({x:.3f}, {y:.3f}, {z:.3f})")
+                # Gradient/slope/derivitive of recent values: are we de/accelorating?!
+                # https://numpy.org/doc/stable/reference/generated/numpy.gradient.html
+                # https://stackoverflow.com/a/24633888/6425926
+                # https://www.turing.com/kb/derivative-functions-in-python#five-point-stencil-method
+                # https://www.stevenhirsch.ca/python-derivative/
+                # https://en.wikipedia.org/wiki/Finite_difference_method#Accuracy_and_order
+                # np.gradient(f, *varargs, axis=None, edge_order=1)
+                # slopes = np.gradient(f)
 
             if verbose and lis3dh.tapped:
                 print("Tapped!")
@@ -641,7 +668,7 @@ while True:
                 time.sleep(1)
                 synth.release((65, 69, 72))  # release the note we pressed
                 time.sleep(2)
-                mixer.voice[0].level = (mixer.voice[0].level - 0.1) % 0.4  # reduce 
+                mixer.voice[0].level = (mixer.voice[0].level - 0.1) % 0.4  # reduce
 
                 print("playing sine wave")
                 # if not button.value:
@@ -705,7 +732,7 @@ while True:
         # print("Now playing: '{}'".format(sample))
         # mp3stream = audiomp3.MP3Decoder(open(sound_dir + mp3files[3], "rb"))
         decoder.file = open(sound_dir + mp3files[3], "rb")
-        audio.play(decoder) 
+        audio.play(decoder)
         # sample_number = (sample_number + 1) % 10
         print("DONE playing mp3[3]")
     # enable.value = audio.playing enable = speaker pin gets enabled to play
