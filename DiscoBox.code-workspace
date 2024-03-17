@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "H:/.fseventsd"
+		},
+		{
+			"path": "H:/archived"
+		},
+		{
+			"path": "H:/docs"
+		},
+		{
+			"path": "H:/lib"
+		},
+		{
+			"path": "H:/non-dist-imgs"
+		},
+		{
+			"path": "H:/sample code"
+		},
+		{
+			"path": "H:/sounds"
+		},
+		{
+			"path": "H:/System Volume Information"
+		}
+	],
+	"settings": {}
+}
