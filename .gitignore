@@ -30,8 +30,17 @@ Thumbs.db
 /.fseventsd
 .metadata_never_index
 /.Trashes
+
 System Volume Information
+
 /System Volume Information/
-"System Volume Information"
+/System Volume Information/*
+
 /.System Volume Information/*
 /.System Volume Information/
+"/.System Volume Information"
+
+"System Volume Information"
+"\System Volume Information"
+".System Volume Information"
+"/System Volume Information"

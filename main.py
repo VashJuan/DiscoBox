@@ -8,6 +8,8 @@
 # region Libraries
 # TODO: https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup
 
+print("Starting! 1")
+
 import time, board  # , analogio, keypad
 import array, math
 import ulab.numpy as np  # numerical approximation methods
@@ -59,6 +61,10 @@ from adafruit_led_animation import helper
 # from adafruit_led_animation.color import PURPLE, JADE, AMBER
 import adafruit_led_animation.color as color  # now we can use color.RED, etc.
 
+
+print("Starting! 2")
+
+
 """
 Colors defined by Adafruit Led Animation library:
     https://docs.circuitpython.org/projects/led-animation/en/latest/api.html#adafruit-led-animation-color
@@ -90,6 +96,9 @@ mp3files = [
 ]
 verbose = True  # print out debug information to serial port?
 # verbose = False   # print out debug information to serial port?
+
+
+print("Starting! 3")
 
 ################################################
 # region Arpeggio: Arpy (broken or rolling chord: notes of a chord individually &
