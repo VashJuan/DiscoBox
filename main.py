@@ -197,7 +197,7 @@ vl53.start_ranging()
 
 #################################################
 # region Enable servo motor
-pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2**15, frequency=50)
 prop_servo = servo.Servo(pwm)
 angle = 0
 angle_plus = True
@@ -394,7 +394,7 @@ if True:
     sine_wave = array.array("H", [0] * length)
     for i in range(length):
         sine_wave[i] = int(
-            (1 + math.sin(math.pi * 2 * i / length)) * TONE_VOLUME * (2 ** 15 - 1)
+            (1 + math.sin(math.pi * 2 * i / length)) * TONE_VOLUME * (2**15 - 1)
         )
     sine_wave_sample = RawSample(sine_wave)
     if verbose:
@@ -556,24 +556,24 @@ while True:
                 x = 0.000001
             rel_chg = ((x - history) / x) * 100
             # if x == history:
-                # print("Same ", rel_chg)
+            # print("Same ", rel_chg)
             # elif x > history:
-                # print("Increasing ", rel_chg)
+            # print("Increasing ", rel_chg)
             # else:
-                # print("Descreasing ", rel_chg)
+            # print("Descreasing ", rel_chg)
             history = x
 
             # if verbose and (not loop_inner % 25):
-                # f"x = {x:.3f} G, y = {y:.3f} G, z = {z:.3f} G (loop:{loop_inner})"
-                # print("({x:.3f}, {y:.3f}, {z:.3f})")
-                # Gradient/slope/derivitive of recent values: are we de/accelorating?!
-                # https://numpy.org/doc/stable/reference/generated/numpy.gradient.html
-                # https://stackoverflow.com/a/24633888/6425926
-                # https://www.turing.com/kb/derivative-functions-in-python#five-point-stencil-method
-                # https://www.stevenhirsch.ca/python-derivative/
-                # https://en.wikipedia.org/wiki/Finite_difference_method#Accuracy_and_order
-                # np.gradient(f, *varargs, axis=None, edge_order=1)
-                # slopes = np.gradient(f)
+            # f"x = {x:.3f} G, y = {y:.3f} G, z = {z:.3f} G (loop:{loop_inner})"
+            # print("({x:.3f}, {y:.3f}, {z:.3f})")
+            # Gradient/slope/derivitive of recent values: are we de/accelorating?!
+            # https://numpy.org/doc/stable/reference/generated/numpy.gradient.html
+            # https://stackoverflow.com/a/24633888/6425926
+            # https://www.turing.com/kb/derivative-functions-in-python#five-point-stencil-method
+            # https://www.stevenhirsch.ca/python-derivative/
+            # https://en.wikipedia.org/wiki/Finite_difference_method#Accuracy_and_order
+            # np.gradient(f, *varargs, axis=None, edge_order=1)
+            # slopes = np.gradient(f)
 
             if verbose and lis3dh.tapped:
                 print("Tapped!")
@@ -659,9 +659,9 @@ while True:
                 # -----------------
                 # modify audio based on switches?
                 # print (-100%8) 4
-                mixer.voice[
-                    0
-                ].level = 0.6  # (mixer.voice[0].level - 0.1) % 0.4  # reduce
+                mixer.voice[0].level = (
+                    0.6  # (mixer.voice[0].level - 0.1) % 0.4  # reduce
+                )
 
                 """
                 synth.press((65, 69, 72))  # midi note 65 = F4
