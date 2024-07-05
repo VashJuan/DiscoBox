@@ -13,7 +13,7 @@ It is based on (& tested with) (https://www.adafruit.com/product/5768)
 
 Circuit Python libraries included in the base product are listed in the right column at
 (https://circuitpython.org/board/adafruit_feather_rp2040_prop_maker/) Additional libraries
-are gfenerally only from the AdaFruit curated libraries at:
+are generally only from the AdaFruit curated libraries at:
 (https://circuitpython.org/libraries)
 
 There are additional libraries available in the Community Bundle, but we aren't currently
@@ -24,94 +24,63 @@ using any of those: (https://github.com/adafruit/CircuitPython_Community_Bundle/
 ![CircuitPython](./non-dist-imgs/circuitpython.png)
 (https://github.com/adafruit/circuitpython)
 
+## Arduino CLI
+
+https://arduino.github.io/arduino-cli/1.0/
+C:\Users\John\AppData\Local\Arduino15\arduino-cli.yaml
+
 ## For Users
 
-To use and see what this application does, simply browse to <https://Rangertrak.org>.
-Additional guidence follows,
-
-### Features
-
-- Open Source: _free_ to use & available to enhance!
-- Progressive Web App (PWA) this should be able to function (in the future, possibly with
-  some degredation) even if the person using this at the command post has no or
-  intermittent access to the Internet or cell system.
-- Periodic reports can include an editable status field and include easily searched notes
-- Source code documentation uses [https://compodoc.app/guides/jsdoc-tags.html]Compodoc
-- Source code is evergreen: current with latest libraries (as of fall 2022)
-
-### Future Roadmap
-
-- This project is moving to using
-  [milestones](https://github.com/EOCOnline/rangertrak/milestones) to show what is being
-  worked on next. Dates are super approximate!
-- Also see the [Issues page](https://github.com/EOCOnline/rangertrak/issues) for what
-  we're working on in terms of bug fixes. Feel free to add your comments to them.
-- To work with out flaws! In particular one often has to refresh some pages to get them to
-  display - especially the Leaflet Maps page - or screen.
-- Issues should be moving from a spreadsheet to
-  [the standard GitHub Issues Page](https://github.com/EOCOnline/rangertrak/issues)
-- Enhance map markers to better highlight paths, teams, statuses.
-- Reload data from local files.
-
-### Installation
-
-At the upper right of every screen, or additinoally on the
-[Settings Page](https://www.RangerTrak.org/settings), You will have the option to
-"Install" the application, which just streamlines access with a shortcut. The application
-takes minimal space and doesn't consume resources in the background. You can uninstall it
-like any other app.
-
-## For Developers Interested in Modifying or Contributing to the Project
-
-- Check out <contributing.md>
+To see what this application does, simply browse to <https://YouTube.com/>. In the future
+we'll put up a video of the mailbox disco in action!
 
 ### Color Optionss
 
-Colors defined by Adafruit Led Animation library Amber, Aqua, Blue, Cyan, Gold, Green,
-Jade, Magenta, Old lace, Orange, Pink, Purple, Red, Teal, White, Yellow
+- Colors defined by Adafruit Led Animation library: Amber, Aqua, Blue, Cyan, Gold, Green,
+  Jade, Magenta, Old lace, Orange, Pink, Purple, Red, Teal, White, Yellow, Old lace (=
+  warm white), Black, or off.
 
-Old lace = warm white Black or off RAINBOW is a list of colors to use for cycling through
-Includes, in order: red, orange, yellow, green, blue, and purple RGBW_WHITE_RGB is for
-RGBW strips to illuminate only the RGB diodes RGBW_WHITE_RGBW is for RGBW strips to
-illuminate the RGB and White diodes RGBW_WHITE_W is for RGBW strips to illuminate only
-White diode
+- RAINBOW is a list of colors to use for cycling through - includes, in order: red,
+  orange, yellow, green, blue, and purple.
 
-### To update documentation
+- RGBW_WHITE_RGB is for RGBW strips to illuminate only the RGB diodes
 
-`npm run compodoc` to regenerate the doc. `compodoc -s` to serve/view the doc at
-<http://127.0.0.1:8080/> See <https://compodoc.app/guides/usage.html> and
-<https://compodoc.app/> for details
+- RGBW_WHITE_RGBW is for RGBW strips to illuminate the RGB and White diodes
+
+- RGBW_WHITE_W is for RGBW strips to illuminate only White diode
+
+## Updating Circuit Python
+
+Get the latest version:
+[Feather RP2040 Prop-Maker Download](https://circuitpython.org/board/adafruit_feather_rp2040_prop_maker/)
+
+"To enter the bootloader, hold down the **BOOT/\*\***BOOTSEL button** (highlighted in red
+above), and while continuing to hold it (don't let go!), press and release the **reset
+button** (highlighted in blue above). **Continue to hold the BOOT/BOOTSEL button until the
+RPI-RP2 drive appears!\*\*
+
+If the drive does not appear, release all the buttons, and then repeat the process above.
+
+You can also start with your board unplugged from USB, press and hold the BOOTSEL button
+(highlighted in red above), continue to hold it while plugging it into USB, and wait for
+the drive to appear before releasing the button." -- from
+https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather?view=all
+
+Then drag the .UF2 file onto the RPI-RP2 drive (_not_ named Circuit Python at this point)
 
 ### To update 3rd party libraries
 
-Commands from Evergreen Angular:
-
-- `npx ng update @angular/core @angular/cdk @angular/cli @angular/google-maps @angular/material`
-  (maybe with ' --force' to avoid peer dependency warnings)
-- `npx ng update`
-- `npx npm-check-updates -u`
-- `npm install`
-
-Other useful commands:
-
-- `npm install -g typings` - Looks for updated Typescript type files.
-- `npx ng update -g` - Updates global cli & sdk
-- `npm install npm@latest -g` - update npm
-- `npm install -g typescript` or to update: `npm -g upgrade typescript`; to get version:
-  `tsc --version` - update typescript
-
-### To Deploy
-
-Deploying via Google Firebase got WAY too complex with Google's recent security upgrades.
-
-Now I just FTP it to <https://RangerTrak.org>
-
-OLD: `ng deploy` `ng add @angular/fire` From Angular Projects, 2nd ed. pg 119 See
-angular.json and firebase.json
+Do we use any???!
 
 ©2023 John Cornelison, under the MIT License
 
 ![MIT License](./non-dist-imgs/MIT_License.png)
+
+### Warning
+
+"The JST connector polarity is matched to Adafruit LiPoly batteries. Using wrong polarity
+batteries can destroy your Feather. Many customers try to save money by purchasing Lipoly
+batteries from Amazon only to find that they plug them in and the Feather is destroyed!""
 
 ### Public Feedback & Contribution
 
@@ -129,7 +98,7 @@ discussions (specific to RangerTrak) can be communicated in the following ways:
   files and submit a pull request for your changes to be merged into the document.
   Directions on how to submit a pull request can be found on GitHub.
 - Send your content suggestions or proposed revisions to the RangerTrak team via email to
-  RangerTeam@eoc.online.
+  disco@vashondesign.com
 
 ### Testimonials
 

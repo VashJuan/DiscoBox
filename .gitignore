@@ -6,6 +6,8 @@
 
 # compiled output
 
+# dependencies
+
 
 # Old code
 /archived
@@ -15,9 +17,10 @@ junk*
 
 # profiling files
 
+
 # IDE - VSCode
 .vscode/*
-!.vscode/arduino.json.json
+!.vscode/arduino.json
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -30,17 +33,3 @@ Thumbs.db
 /.fseventsd
 .metadata_never_index
 /.Trashes
-
-System Volume Information
-
-/System Volume Information/
-/System Volume Information/*
-
-/.System Volume Information/*
-/.System Volume Information/
-"/.System Volume Information"
-
-"System Volume Information"
-"\System Volume Information"
-".System Volume Information"
-"/System Volume Information"
