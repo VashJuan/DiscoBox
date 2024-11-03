@@ -333,9 +333,9 @@ mp3_file2 = (
 wave = audiocore.WaveFile(open(wav_file2, "rb"))
 mp3 = audiomp3.MP3Decoder(open(mp3_file2, "rb"))
 mixer.voice[0].play(wave)
-mixer.voice[0].level = 0.4
+mixer.voice[0].level = 0.6
 mixer.voice[1].play(mp3)
-mixer.voice[1].level = 0.2
+mixer.voice[1].level = 0.6
 
 play_arpy = False
 
@@ -746,7 +746,6 @@ while True:
         # print("Waiting for button press to continue!")
         # while button.value:
         #     pass
-
 
     if audio.playing is False:
         print("play mp3[3]...")
