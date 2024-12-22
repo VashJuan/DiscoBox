@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+Adafruit CircuitPython 9.2.1 on 2024-11-20; Adafruit Feather RP2040 Prop-Maker with rp2040
+=======
 Adafruit CircuitPython 9.2.0 on 2024-10-28; Adafruit Feather RP2040 Prop-Maker with rp2040
+>>>>>>> 7f2361f993ed5a154cf6d67b3b77ae830aafc19c
 Board ID:adafruit_feather_rp2040_prop_maker
 UID:DF62585783343637
