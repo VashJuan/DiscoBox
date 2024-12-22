@@ -16,6 +16,9 @@ of the mailbox disco in action!
 
 ### Installation
 
+![alt text](non-dist-imgs/DiscoBox-Assembled.jpg)
+![alt text](non-dist-imgs/DiscoBox-Closeup.jpg)
+
 - Attach your devices to the PropMaker. What I did:
 
   - On the other end from the USB connector is a 6 screw green connector with
