@@ -14,6 +14,34 @@ To see what this application does, browse to
 [https://YouTube.com/](https://YouTube.com/). In the future we'll put up a video
 of the mailbox disco in action!
 
+### Installation
+
+- Attach your devices to the PropMaker. What I did:
+
+  - On the other end from the USB connector is a 6 screw green connector with
+    the following labels on the bottom of the circuit board:
+  - - & - go to a 4-8 ohm (Ω) speaker
+  - Btn (button) is left disconnected
+  - 5V, G & Neo (5 volt positive, Ground & NeoPixel data line) are connected to
+    a LED panel.
+  - Immediately in front of the 6 screw green connector is a standard 3 pin
+    connector for the servo motor
+  - move a little towards the USB connector and (near pin 10) is a small blond
+    'Grove(?)' connector with can be attached to the ToF sensor (VL53L1X for me)
+  - Finally plug in a USB cord from your computer to the device's USB C plug.
+    With power the PropMaker should light up. If connected and with CIrcuit Pi
+    installed, you should see a new drive' on your computer.
+
+- Install Circuit Python onto your PropMaker if necessary. (It should arrive
+  from the manufacturer with that preinstalled. If not, follow directions below
+  for updating the library, or go to https://Adafruit.com or
+  https://CircuitPython.org for the latest instructions.)
+
+- Copy the `/lib/` and `/sounds/` directories, and the `main.py` file from the
+  same directory as you are reading this ReadMe.md file
+  (https://github.com/vashjuan/DiscoBox/ most likely) to the root directory of
+  the PropMaker.
+
 ### Hardware
 
 This is a Circuit Python script, derived from Adafruit's PropMaker example &
