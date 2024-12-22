@@ -1,3 +1,5 @@
-"terminal.integrated.env.windows": {
-    "PYTHONPATH": "./lib/"
+{
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "./lib/"
+    }
 }
