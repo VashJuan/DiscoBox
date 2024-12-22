@@ -747,6 +747,7 @@ while True:
         # while button.value:
         #     pass
 
+
     if audio.playing is False:
         print("play mp3[3]...")
         # sample = sound_dir + "lars_0{}.mp3".format(sample_number)
