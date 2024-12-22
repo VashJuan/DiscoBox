@@ -32,32 +32,36 @@ future we'll put up a video of the mailbox disco in action!
 
 ## Updating Circuit Python
 
-Download the latest version to a local location:
-[Feather RP2040 Prop-Maker Download](https://circuitpython.org/board/adafruit_feather_rp2040_prop_maker/)
+1. Download the latest version of the \*.uf2 file from:
+   [Feather RP2040 Prop-Maker Download](https://circuitpython.org/board/adafruit_feather_rp2040_prop_maker/)
+   to a local location.
 
-### Enter Bootloader
+2. Enter Bootloader
 
-> > > "To enter the bootloader, hold down the **BOOT/BOOTSEL** button
-> > > (highlighted in red above), and while continuing to hold it (don't let
-> > > go!), press and release the **reset button** (highlighted in blue above).
-> > > **Continue to hold the BOOT/BOOTSEL button until the RPI-RP2 drive
-> > > appears!**
-> > >
-> > > If the drive does not appear, release all the buttons, and then repeat the
-> > > process above.
-> > >
-> > > You can also start with your board unplugged from USB, press and hold the
-> > > BOOTSEL button (highlighted in red above), continue to hold it while
-> > > plugging it into USB, and wait for the drive to appear before releasing
-> > > the button."
-> > >
-> > > -- from
-> > > https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather?view=all
+> "To enter the bootloader, hold down the **BOOT/BOOTSEL** button (highlighted
+> in red above), and while continuing to hold it (don't let go!), press and
+> release the **reset button** (highlighted in blue above). **Continue to hold
+> the BOOT/BOOTSEL button until the RPI-RP2 drive appears!**
+>
+> If the drive does not appear, release all the buttons, and then repeat the
+> process above.
+>
+> You can also start with your board unplugged from USB, press and hold the
+> BOOTSEL button (highlighted in red above), continue to hold it while plugging
+> it into USB, and wait for the drive to appear before releasing the button."
+>
+> -- from https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather?view=all
 
-### Update the PropMaker's library
+3. Update the PropMaker's library
 
-**Then drag the .UF2 file onto the RPI-RP2 drive (_not_ named Circuit Python at
-this point)**
+Then drag the .UF2 file you downloaded onto the RPI-RP2 drive -- _not_ named
+Circuit Python at this point!
+
+A few seconds after the new \*.uf2 file is copied to the RPI-RP2 drive, the new
+file is automatically installed and the drive will disappear & then show up as
+CIRCUITPY again.
+
+You're done!
 
 ### To update 3rd party libraries
 
