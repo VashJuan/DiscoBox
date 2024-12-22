@@ -6,15 +6,21 @@
 # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather
 
 # region Libraries
-# TODO: https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup
+# TODO: https://learn.adafruit.com/
+# keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup
 
-print("Starting! 1")
 
-import time, board  # , analogio, keypad
-import array, math
-import ulab.numpy as np  # numerical approximation methods
+import time
+
+import array
+import math
+
+# , analogio, keypad
+
 from random import randrange
-import asyncio
+import ulab.numpy as np  # numerical approximation methods
+
+# import _asyncio
 
 # import adafruit_ticks
 
@@ -22,13 +28,17 @@ from audiocore import RawSample
 import audiocore  # for WAV files
 import audiobusio  # for I2S audio with external I2S DAC board
 import audiomixer
-import pwmio, audiopwmio, synthio, simpleio, audiomp3
+import pwmio
+import audiopwmio
+import synthio
+import simpleio
+import audiomp3
 
 # from audiomp3 import MP3Decoder
 
 # import digitalio
 from digitalio import DigitalInOut, Pull
-from arpy import Arpy  # Uses arpeggios class:
+
 
 try:
     from audioio import AudioOut
@@ -42,12 +52,16 @@ except ImportError:
 import adafruit_vl53l1x  # "Time of flight", i.e., distance sensor
 import adafruit_lis3dh  # accelerometer
 
+import board
+
+
 # from adafruit_seesaw import seesaw, rotaryio, digitalio  # Adafruit ANO Rotary Encoder
 from adafruit_motor import servo
 
 
 # https://learn.adafruit.com/circuitpython-led-animations
-import neopixel, rainbowio
+import neopixel
+import rainbowio
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.animation.comet import Comet
 from adafruit_led_animation.animation.rainbowcomet import RainbowComet
@@ -61,18 +75,20 @@ from adafruit_led_animation import helper
 # from adafruit_led_animation.color import PURPLE, JADE, AMBER
 import adafruit_led_animation.color as color  # now we can use color.RED, etc.
 
+from arpy import Arpy  # Uses arpeggios class:
 
-print("Starting! 2")
 
-
+print("Disco Mailbox - Using RP2040 Prop-Maker Feather 1")
 """
 Colors defined by Adafruit Led Animation library:
     https://docs.circuitpython.org/projects/led-animation/en/latest/api.html#adafruit-led-animation-color
-    Amber, Aqua, Black, Blue, Cyan, Gold, Green, Jade, Magenta, Old lace, Orange, Pink, Purple, Red, Teal, White, Yellow
+    Amber, Aqua, Black, Blue, Cyan, Gold, Green, Jade, Magenta,
+    Old lace, Orange, Pink, Purple, Red, Teal, White, Yellow
 
     Old lace = warm white
     Black = off
-    RAINBOW is a list of colors to use for cycling through Includes, in order: red, orange, yellow, green, blue, and purple
+    RAINBOW is a list of colors to use for cycling through Includes,
+    in order: red, orange, yellow, green, blue, and purple
     RGBW_WHITE_RGB is for RGBW strips to illuminate only the RGB diodes
     RGBW_WHITE_RGBW is for RGBW strips to illuminate the RGB and White diodes
     RGBW_WHITE_W is for RGBW strips to illuminate only White diode
@@ -84,6 +100,7 @@ Colors defined by Adafruit Led Animation library:
 # from another_file import *
 
 # endregion
+print("Disco Mailbox - Using RP2040 Prop-Maker Feather 3")
 
 sound_dir = "sounds/"
 mp3files = [
@@ -96,9 +113,6 @@ mp3files = [
 ]
 verbose = True  # print out debug information to serial port?
 # verbose = False   # print out debug information to serial port?
-
-
-print("Starting! 3")
 
 ################################################
 # region Arpeggio: Arpy (broken or rolling chord: notes of a chord individually &
@@ -319,9 +333,9 @@ mp3_file2 = (
 wave = audiocore.WaveFile(open(wav_file2, "rb"))
 mp3 = audiomp3.MP3Decoder(open(mp3_file2, "rb"))
 mixer.voice[0].play(wave)
-mixer.voice[0].level = 0.4
+mixer.voice[0].level = 0.6
 mixer.voice[1].play(mp3)
-mixer.voice[1].level = 0.2
+mixer.voice[1].level = 0.6
 
 play_arpy = False
 
@@ -377,7 +391,7 @@ if True:
 
     # data = open(sound_dir + "lonely.mid", "rb")
     # midi = synthio.from_file(data)
-    if False:  # verbose:
+    if False:
         bps = "undefined"  # midi.bits_per_sample
         sr = midi.sample_rate  # 11025
         print("midi file bps:", bps, " sample rate:", sr)
@@ -734,7 +748,6 @@ while True:
         #     pass
 
 
-"""
     if audio.playing is False:
         print("play mp3[3]...")
         # sample = sound_dir + "lars_0{}.mp3".format(sample_number)
@@ -745,4 +758,3 @@ while True:
         # sample_number = (sample_number + 1) % 10
         print("DONE playing mp3[3]")
     # enable.value = audio.playing enable = speaker pin gets enabled to play
-"""
