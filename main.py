@@ -9,7 +9,6 @@
 # TODO: https://learn.adafruit.com/
 # keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup
 
-
 import time
 
 import array
@@ -19,6 +18,7 @@ import math
 
 from random import randrange
 import ulab.numpy as np  # numerical approximation methods
+
 
 # import _asyncio
 
@@ -38,7 +38,6 @@ import audiomp3
 
 # import digitalio
 from digitalio import DigitalInOut, Pull
-
 
 try:
     from audioio import AudioOut
@@ -61,6 +60,7 @@ from adafruit_motor import servo
 
 # https://learn.adafruit.com/circuitpython-led-animations
 import neopixel
+
 import rainbowio
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.animation.comet import Comet
@@ -220,7 +220,7 @@ vl53.start_ranging()
 
 #################################################
 # region Enable servo motor
-pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2**15, frequency=50)
+pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2 ** 15, frequency=50)
 prop_servo = servo.Servo(pwm)
 angle = 0
 angle_plus = True
@@ -265,7 +265,8 @@ rainbow_comet_v = RainbowComet(
     pixel_wing_vertical, speed=anim_speed, tail_length=7, bounce=True
 )
 rainbow_v = Rainbow(pixel_wing_vertical, speed=anim_speed, period=2)
-# rainbow_chase_h = RainbowChase(pixel_wing_horizontal, speed=anim_speed, size=3, spacing=3)
+# rainbow_chase_h = RainbowChase(pixel_wing_horizontal, speed=anim_speed, size=3,
+# spacing=3)
 rainbow_chase_h = RainbowChase(pixels, speed=anim_speed, size=3, spacing=3)
 rainbow_sparkle = RainbowSparkle(pixels, speed=anim_speed, num_sparkles=10)
 
@@ -320,13 +321,16 @@ mixer = audiomixer.Mixer(
     samples_signed=True,  # False,
 )
 # mixer = audiomixer.Mixer(channel_count=2, sample_rate=22050, buffer_size=2048)
-audio.play(mixer)  #   , loop=True # attach mixer to audio playback
+audio.play(mixer)
+#   , loop=True # attach mixer to audio playback
 # time.sleep(1)
 # audio.stop()
 
-wav_file2 = "sounds/amenfull_22k_s16.wav"  # in 'circuitpython-tricks/larger-tricks/breakbeat_wavs'
+wav_file2 = "sounds/amenfull_22k_s16.wav"
+# in 'circuitpython-tricks/larger-tricks/breakbeat_wavs'
 mp3_file2 = (
-    "sounds/One_Day-22Hz-16kbpsConst.mp3"  # in 'circuitpython-tricks/larger-tricks/wav'
+    "sounds/One_Day-22Hz-16kbpsConst.mp3"
+    # in 'circuitpython-tricks/larger-tricks/wav'
 )
 # https://freesound.org/people/f-r-a-g-i-l-e/sounds/476663/
 
@@ -360,14 +364,15 @@ if True:
     # https://github.com/todbot/circuitpython-tricks#preparing-audio-files-for-circuitpython
     # mixer = audiomixer.Mixer(voice_count=1, sample_rate=16000, channel_count=1,
     #                       bits_per_sample=16, samples_signed=True)
-    # Play a WAV file (e.g., from https://github.com/KristofferKarlAxelEkstrand/AKWF-FREE, https://WaveEditOnline.com)
+    # Play a WAV file (e.g., from
+    # https://github.com/KristofferKarlAxelEkstrand/AKWF-FREE, https://WaveEditOnline.com)
     wav_song = audiocore.WaveFile(open(sound_dir + "bowing.wav", "rb"))  # 16 & 44100
     if verbose:
         bps = wav_song.bits_per_sample  # 16
         sr = wav_song.sample_rate  # 44100
         print("WAV song bps:", bps, " sample rate:", sr)
 
-    ######## Play Midi
+    # ######## Play Midi
     # https://github.com/todbot/circuitpython-tricks#usb-midi
     # https://docs.circuitpython.org/en/latest/shared-bindings/synthio/index.html#synthio.MidiTrack
     melody = synthio.MidiTrack(
@@ -386,11 +391,12 @@ if True:
             pass
         print("play midi melody DONE")
 
-    ##### Get Midi file
-    # https://bitmidi.com/, https://midisfree.com, https://musiclab.chromeexperiments.com/Song-Maker/,
+    # #### Get Midi file
+    # https://bitmidi.com/, https://midisfree.com,
+    # https://musiclab.chromeexperiments.com/Song-Maker/,
 
-    # data = open(sound_dir + "lonely.mid", "rb")
-    # midi = synthio.from_file(data)
+    data = open(sound_dir + "lonely.mid", "rb")
+    midi = synthio.from_file(data)
     if False:
         bps = "undefined"  # midi.bits_per_sample
         sr = midi.sample_rate  # 11025
@@ -401,7 +407,7 @@ if True:
             pass
         print("Play midi file DONE")
 
-    ######## Create Synth
+    # ####### Create Synth
     # synth = synthio.Synthesizer(channel_count=1, sample_rate=22050)
     synth = synthio.Synthesizer(channel_count=1, sample_rate=9990)
     if verbose:
@@ -409,7 +415,7 @@ if True:
         sr = synth.sample_rate  # 9990
         print("Synth sample bps:", bps, " sample rate:", sr)
 
-    ####### Create sine wave sample
+    # ###### Create sine wave sample
     # https://github.com/todbot/circuitpython-tricks#making-simple-tones
     TONE_VOLUME = 0.1  # Increase this to increase the volume of the tone.
     frequency = 440  # Set this to the Hz of the tone you want to generate.
@@ -417,7 +423,7 @@ if True:
     sine_wave = array.array("H", [0] * length)
     for i in range(length):
         sine_wave[i] = int(
-            (1 + math.sin(math.pi * 2 * i / length)) * TONE_VOLUME * (2**15 - 1)
+            (1 + math.sin(math.pi * 2 * i / length)) * TONE_VOLUME * (2 ** 15 - 1)
         )
     sine_wave_sample = RawSample(sine_wave)
     if verbose:
@@ -427,7 +433,7 @@ if True:
         # mixer.music.load('background.wav')
         # mixer.music.play(-1)  # will cause song to loop
 
-    ########## Play some of the above...
+    # ######### Play some of the above...
     if False:
         # audio.play(mixer)
 
@@ -443,7 +449,8 @@ if True:
 
         mixer.voice[1].play(
             sine_wave_sample
-        )  # requires signed_samples=False ... The sample's sample rate does not match the mixer's
+        )  # requires signed_samples=False ...
+        # The sample's sample rate does not match the mixer's
         mixer.voice[1].level = 0.4
         if verbose:
             print("Mixer voice 1 playing...")
@@ -451,7 +458,8 @@ if True:
 
 
 elif play_arpy:
-    # https://github.com/todbot/circuitpython-synthio-tricks/tree/main/examples/eighties_arp based code
+    # https://github.com/todbot/circuitpython-synthio-tricks/tree/main/
+    # examples/eighties_arp based code
     audio = audiopwmio.PWMAudioOut(board.RX)  # RX pin on QTPY RP2040
 
     mixer = audiomixer.Mixer(channel_count=1, sample_rate=28000, buffer_size=2048)
@@ -519,7 +527,7 @@ knobA_value = 10000  # knobA.value
 knobB_value = 10000  # knobB.value
 # endregion
 
-#################################################
+# ################################################
 loop = 0
 loop_inner = 0
 mailbox_lid_open = False
@@ -547,7 +555,7 @@ while True:
         #   mixer.voice[1].play(song2)    # Play another sample/voice
         """
 
-        #################################################
+        # ################################################
         # This allows you to do other things while the audio plays!
         while True:  # audio.playing:
             loop_inner += 1
@@ -607,7 +615,7 @@ while True:
             # endregion
 
             # Above code always runs
-            # Code below only runs if mailbox lid is opened, in order to save battery power
+            # Code below only runs if mailbox lid is opened, to save battery
             """
             if not switch.value and switch_state is False:
                 external_power.value = False
@@ -682,9 +690,9 @@ while True:
                 # -----------------
                 # modify audio based on switches?
                 # print (-100%8) 4
-                mixer.voice[0].level = (
-                    0.6  # (mixer.voice[0].level - 0.1) % 0.4  # reduce
-                )
+                mixer.voice[
+                    0
+                ].level = 0.6  # (mixer.voice[0].level - 0.1) % 0.4  # reduce
 
                 """
                 synth.press((65, 69, 72))  # midi note 65 = F4
@@ -747,13 +755,13 @@ while True:
         # while button.value:
         #     pass
 
-
     if audio.playing is False:
         print("play mp3[3]...")
         # sample = sound_dir + "lars_0{}.mp3".format(sample_number)
         # print("Now playing: '{}'".format(sample))
         # mp3stream = audiomp3.MP3Decoder(open(sound_dir + mp3files[3], "rb"))
-        decoder.file = open(sound_dir + mp3files[3], "rb")
+        # decoder.file = open(sound_dir + mp3files[3], "rb")
+        decoder = open(sound_dir + mp3files[3], "rb")
         audio.play(decoder)
         # sample_number = (sample_number + 1) % 10
         print("DONE playing mp3[3]")
