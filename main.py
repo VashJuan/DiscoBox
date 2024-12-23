@@ -6,24 +6,23 @@
 # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather
 
 # region Libraries
+# cSpell:disable
 # TODO: https://learn.adafruit.com/
 # keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup
+# Python modules:
+# from another_file import another_function
+# import another_file
+# from another_file import *
 
 import time
-
 import array
 import math
-
 # , analogio, keypad
 
 from random import randrange
 import ulab.numpy as np  # numerical approximation methods
-
-
 # import _asyncio
-
 # import adafruit_ticks
-
 from audiocore import RawSample
 import audiocore  # for WAV files
 import audiobusio  # for I2S audio with external I2S DAC board
@@ -33,9 +32,7 @@ import audiopwmio
 import synthio
 import simpleio
 import audiomp3
-
 # from audiomp3 import MP3Decoder
-
 # import digitalio
 from digitalio import DigitalInOut, Pull
 
@@ -45,22 +42,17 @@ except ImportError:
     try:
         from audiopwmio import PWMAudioOut as AudioOut
     except ImportError:
-        print("Input error")
+        print("Could not import AudioOut library")
         pass  # not always supported by every board!
 
 import adafruit_vl53l1x  # "Time of flight", i.e., distance sensor
 import adafruit_lis3dh  # accelerometer
-
 import board
-
-
 # from adafruit_seesaw import seesaw, rotaryio, digitalio  # Adafruit ANO Rotary Encoder
 from adafruit_motor import servo
 
-
 # https://learn.adafruit.com/circuitpython-led-animations
 import neopixel
-
 import rainbowio
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.animation.comet import Comet
@@ -71,14 +63,10 @@ from adafruit_led_animation.animation.chase import Chase
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import helper
-
 # from adafruit_led_animation.color import PURPLE, JADE, AMBER
 import adafruit_led_animation.color as color  # now we can use color.RED, etc.
-
 from arpy import Arpy  # Uses arpeggios class:
 
-
-print("Disco Mailbox - Using RP2040 Prop-Maker Feather 1")
 """
 Colors defined by Adafruit Led Animation library:
     https://docs.circuitpython.org/projects/led-animation/en/latest/api.html#adafruit-led-animation-color
@@ -93,14 +81,8 @@ Colors defined by Adafruit Led Animation library:
     RGBW_WHITE_RGBW is for RGBW strips to illuminate the RGB and White diodes
     RGBW_WHITE_W is for RGBW strips to illuminate only White diode
 """
-
-# Python modules:
-# from another_file import another_function
-# import another_file
-# from another_file import *
-
+print("Disco Mailbox - RP2040 Prop-Maker Feather has imported libraries")
 # endregion
-print("Disco Mailbox - Using RP2040 Prop-Maker Feather 3")
 
 sound_dir = "sounds/"
 mp3files = [
@@ -111,8 +93,8 @@ mp3files = [
     "Africa.mp3",
     "oneday.mp3",
 ]
-verbose = True  # print out debug information to serial port?
-# verbose = False   # print out debug information to serial port?
+verbose = True  # print debug information to serial port
+# verbose = False   # no debug information to serial port
 
 ################################################
 # region Arpeggio: Arpy (broken or rolling chord: notes of a chord individually &
@@ -190,7 +172,6 @@ button_states = [select_held, up_held, left_held, down_held, right_held]
     external_button.switch_to_input(pull=digitalio.Pull.UP)
 """
 
-
 #################################################
 # region Time of Flight - i.e., distance measurement
 # https://learn.adafruit.com/adafruit-vl53l1x
@@ -226,6 +207,7 @@ angle = 0
 angle_plus = True
 # endregion
 
+print("Disco Mailbox - button, rotary encoder, switch ToF & servo setup")
 #################################################
 # region External neopixels
 # https://learn.adafruit.com/circuitpython-led-animations
@@ -322,7 +304,7 @@ mixer = audiomixer.Mixer(
 )
 # mixer = audiomixer.Mixer(channel_count=2, sample_rate=22050, buffer_size=2048)
 audio.play(mixer)
-#   , loop=True # attach mixer to audio playback
+# , loop=True # attach mixer to audio playback
 # time.sleep(1)
 # audio.stop()
 
@@ -365,7 +347,8 @@ if True:
     # mixer = audiomixer.Mixer(voice_count=1, sample_rate=16000, channel_count=1,
     #                       bits_per_sample=16, samples_signed=True)
     # Play a WAV file (e.g., from
-    # https://github.com/KristofferKarlAxelEkstrand/AKWF-FREE, https://WaveEditOnline.com)
+    # https://github.com/KristofferKarlAxelEkstrand/AKWF-FREE,
+    # https://WaveEditOnline.com)
     wav_song = audiocore.WaveFile(open(sound_dir + "bowing.wav", "rb"))  # 16 & 44100
     if verbose:
         bps = wav_song.bits_per_sample  # 16
@@ -395,17 +378,17 @@ if True:
     # https://bitmidi.com/, https://midisfree.com,
     # https://musiclab.chromeexperiments.com/Song-Maker/,
 
-    data = open(sound_dir + "lonely.mid", "rb")
-    midi = synthio.from_file(data)
-    if False:
-        bps = "undefined"  # midi.bits_per_sample
-        sr = midi.sample_rate  # 11025
-        print("midi file bps:", bps, " sample rate:", sr)
-        print("Play midi file")
-        audio.play(midi)  # mixer needs samples_signed=True
-        while audio.playing:
-            pass
-        print("Play midi file DONE")
+    # data = open(sound_dir + "lonely.mid", "rb")
+    # midi = synthio.from_file(data)
+    # if False:
+        # bps = "undefined"  # midi.bits_per_sample
+        # sr = midi.sample_rate  # 11025
+        # print("midi file bps:", bps, " sample rate:", sr)
+        # print("Play midi file")
+        # audio.play(midi)  # mixer needs samples_signed=True
+        # while audio.playing:
+            # pass
+        # print("Play midi file DONE")
 
     # ####### Create Synth
     # synth = synthio.Synthesizer(channel_count=1, sample_rate=22050)
