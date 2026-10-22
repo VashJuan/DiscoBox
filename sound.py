@@ -42,10 +42,10 @@ def setup_audio(test_clips=True):
     # dac = audioio.AudioOut(board.SPEAKER)
 
     # Using mixer just to enable volume control
-    # channel1 is mp3, channel 2 will be used for synth sounds
+    # voice 0: songs, voice 1: door creak, voice 2: slide whistle
     # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather/audio-mixer-volume-control
     mixer = audiomixer.Mixer(
-        voice_count=2,
+        voice_count=3,
         channel_count=MIXER_CHANNELS,
         sample_rate=MIXER_SAMPLE_RATE,  # 8000,
         #    buffer_size=2048,

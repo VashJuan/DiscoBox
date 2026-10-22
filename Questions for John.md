@@ -19,3 +19,7 @@
     the board is still. Undecided: tune further or pick another sound (Q4).
 - **Q4** (2026-10-22): Keep working on the creak, or replace it with a
   different door sound (e.g. a recorded creak WAV, a slide whistle, a "boing")?
+- **Q5** (2026-10-22): How does the slide whistle (whistle.py) sound when a
+  hand or mail passes through the beam? Too loud or quiet, too high or low,
+  does it play when nothing moves, and does the song crackle now that three
+  sounds share the mixer? (Tuning numbers are at the top of whistle.py.)

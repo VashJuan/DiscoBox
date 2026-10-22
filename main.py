@@ -12,6 +12,7 @@
 #   prop_servo.py  servo sweep
 #   sound.py       I2S audio, mixer & start-up audio tests
 #   creak.py       cartoon door creak (when door_creak is True)
+#   whistle.py     slide whistle from the distance sensor (when slide_whistle is True)
 #   arp_synth.py   Arpy arpeggiator synth (when play_arpy is True)
 #   arpy.py        Arpy arpeggio class
 
@@ -23,7 +24,7 @@ import time
 import board
 from digitalio import DigitalInOut
 
-from config import verbose, production, mp3files, play_arpy, door_creak
+from config import verbose, production, mp3files, play_arpy, door_creak, slide_whistle
 import sound
 
 
@@ -124,6 +125,12 @@ if door_creak and not play_arpy:
 
     creak = DoorCreak(mixer)
 
+whistle = None
+if slide_whistle and not play_arpy:
+    from whistle import SlideWhistle
+
+    whistle = SlideWhistle(mixer)
+
 # ################################################
 loop_inner = 0
 mailbox_lid_open = False
@@ -139,10 +146,15 @@ def tick():
 
     # -----------------
     # region Measure distance
-    if vl53.data_ready and (not loop_inner % 25):
-        if verbose:
-            print("Distance: {} cm".format(vl53.distance))
+    if vl53.data_ready:
+        distance = vl53.distance  # cm, or None when nothing is in range
         vl53.clear_interrupt()
+        if verbose and not loop_inner % 25:
+            print("Distance: {} cm".format(distance))
+        if whistle:
+            whistle.distance(distance)
+    if whistle:
+        whistle.update()
     # endregion
 
     # -----------------

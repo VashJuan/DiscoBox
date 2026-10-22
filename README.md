@@ -64,6 +64,19 @@ effects below run at the same time.
   `door_creak = False` in `config.py`.
 - Status: built, not yet tuned by ear on the real door.
 
+### Slide whistle (`whistle.py`)
+
+- When a hand or mail moves through the distance sensor's beam, a whistle
+  plays over the song, gliding with the distance: about 1800 Hz at 3 cm, 500 Hz
+  at 130 cm.
+- It starts when a reading changes by 3 cm or more, and fades out 0.4 s after
+  readings stop changing, or as soon as nothing is in range.
+- It works for mail going in and coming out; telling the two apart is still an
+  idea (see [IDEAS.md](IDEAS.md)).
+- The tuning numbers are at the top of `whistle.py`. Turn the whistle off with
+  `slide_whistle = False` in `config.py`.
+- Status: built, not yet tried on the board.
+
 ### Lights (`lights.py`)
 
 - The external 8x8 NeoPixel panel (64 LEDs, brightness 5%) runs a sequence of
@@ -89,12 +102,11 @@ effects below run at the same time.
 - **Accelerometer (LIS3DH, on the Feather):** drives the door creak. In debug
   mode it also prints "Tapped!" and "Shaken!".
 - **Distance sensor (VL53L1X):** measures up to about 1.3 m, about 10 times a
-  second. For now the reading is only printed in debug mode; mail-in and
-  mail-out effects are planned (see [IDEAS.md](IDEAS.md)).
+  second. Drives the slide whistle; in debug mode the reading is also printed.
 
 ### Arpeggiator mode (experimental)
 
-- With `play_arpy = True` in `config.py`, the songs and creak are replaced by
+- With `play_arpy = True` in `config.py`, the songs, creak and whistle are replaced by
   an 80s-style synth arpeggio (`arp_synth.py`, `arpy.py`) whose root note,
   tempo and pattern change at random, and the Feather's own LED changes colour
   with each note. This mode sends audio to the RX pin, not the speaker
@@ -107,6 +119,7 @@ effects below run at the same time.
 | `production` | `True`: fast start, music first, no debug printing. `False`: play the start-up audio tests first and print debug information to the serial console. |
 | `mp3files` | The playlist, in order. |
 | `door_creak` | `True` to play the door creak. |
+| `slide_whistle` | `True` to play the slide whistle. |
 | `play_arpy` | `True` for the arpeggiator instead of songs. |
 
 ### Code layout
@@ -117,6 +130,7 @@ effects below run at the same time.
 | `config.py` | Settings |
 | `sound.py` | Speaker output, mixer, playlist & start-up audio tests |
 | `creak.py` | Door creak |
+| `whistle.py` | Slide whistle |
 | `lights.py` | NeoPixel animations |
 | `prop_servo.py` | Servo sweep |
 | `sensors.py` | Distance sensor & accelerometer |

@@ -5,13 +5,12 @@ yet. Mark each one as tried, kept or dropped, with the date and a short note.
 
 ## What the hardware gives us
 
-- **Mixer:** 2 voices at 22050 Hz mono (`sound.py`). Songs play on `voice[0]`;
-  `voice[1]` is free for effects that blend over the song. Only songs at 22050 Hz
+- **Mixer:** 3 voices at 22050 Hz mono (`sound.py`). Songs play on `voice[0]`,
+  the creak on `voice[1]`, the slide whistle on `voice[2]`. Only songs at 22050 Hz
   mono go through the mixer; other songs bypass it and can't be blended with.
-  More voices are possible (`voice_count=3`) if effects need to overlap.
 - **Distance sensor (VL53L1X):** about 10 readings a second (100 ms timing
-  budget), short range mode (up to about 1.3 m). `distance` can be `None`. Today
-  it is only printed in debug mode.
+  budget), short range mode (up to about 1.3 m). `distance` can be `None`. It
+  drives the slide whistle.
 - **Accelerometer (LIS3DH)** on the Feather, which is mounted on the door. The
   gravity direction gives the door angle. Needs a one-time calibration: one
   reading closed, one fully open.
@@ -24,7 +23,7 @@ yet. Mark each one as tried, kept or dropped, with the date and a short note.
 
 | Idea | How | Status |
 | --- | --- | --- |
-| Slide whistle | Hold one `synthio.Note` (sine or triangle wave) on `voice[1]`; map distance to pitch while readings change; smooth the pitch so it glides | idea |
+| Slide whistle | Hold one `synthio.Note` (sine wave) on `voice[2]`; map distance to pitch while readings change; smooth the pitch so it glides (`whistle.py`, `slide_whistle` in `config.py`) | built 2026-10-22, untested |
 | "That tastes good" on mail in | Note the distance when the door opens; when readings settle (steady for ~1 s), a shorter distance means the pile grew | idea |
 | "Here you go" on mail out | Same, but a longer distance means mail was taken | idea |
 | Whistle, then voice line | Whistle while mail moves, voice clip once it settles | idea |
