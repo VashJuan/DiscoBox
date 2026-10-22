@@ -20,7 +20,7 @@
 import board
 from digitalio import DigitalInOut
 
-from config import verbose, mp3files, sound_dir, play_arpy
+from config import verbose, mp3files, play_arpy
 import sensors
 import lights
 import sound
@@ -101,100 +101,107 @@ loop_inner = 0
 mailbox_lid_open = False
 x = 0
 
+
+def tick():
+    """One pass of sensors, lights, servo & synth; runs while a song plays"""
+    global loop_inner, x, mailbox_lid_open
+    loop_inner += 1
+    if verbose and (not loop_inner % 100):
+        print("Inner Loop count: ", loop_inner)
+
+    # -----------------
+    # region Measure distance
+    if vl53.data_ready and (not loop_inner % 25):
+        if verbose:
+            print("Distance: {} cm".format(vl53.distance))
+        vl53.clear_interrupt()
+    # endregion
+
+    # -----------------
+    # region Read LIS3DH values
+    history = x
+    x, y, z = sensors.read_acceleration(lis3dh)
+    if x == 0:
+        x = 0.000001
+    rel_chg = ((x - history) / x) * 100
+    # Gradient/slope/derivitive of recent values: are we de/accelorating?!
+    # https://numpy.org/doc/stable/reference/generated/numpy.gradient.html
+    # https://stackoverflow.com/a/24633888/6425926
+    # https://www.stevenhirsch.ca/python-derivative/
+
+    if verbose and lis3dh.tapped:
+        print("Tapped!")
+    if verbose and lis3dh.shake(shake_threshold=12):  # default 30 too high
+        print("Shaken!")
+    # endregion
+
+    # Above code always runs
+    # Code below only runs if mailbox lid is opened, to save battery
+    """
+    if not switch.value and switch_state is False:
+        external_power.value = False
+        switch_state = True
+    if switch.value and switch_state is True:
+        external_power.value = True
+        switch_state = False
+    """
+    mailbox_lid_open = True
+
+    external_power.switch_to_output(value=mailbox_lid_open)
+    if mailbox_lid_open:
+        # Mailbox is being used!!!
+
+        # -----------------
+        # region Check buttons/switches
+        """
+        position = encoder.position
+        if position != last_position:
+            last_position = position
+            if verbose:
+                print(f"Position: {position}")
+        for b in range(5):
+            if not buttons[b].value and button_states[b] is False:
+                button_states[b] = True
+                if verbose:
+                    print(f"{button_names[b]} button pressed")
+            if buttons[b].value and button_states[b] is True:
+                button_states[b] = False
+                if verbose:
+                    print(f"{button_names[b]} button released")
+        """
+        # endregion
+
+        if play_arpy:
+            arp_step(arpy)
+
+        # -----------------
+        # modify audio based on switches?
+        mixer.voice[0].level = 0.6
+
+        # -----------------
+        # Next step of the external neopixel animation
+        # How to make responsive animations???
+        # https://docs.circuitpython.org/projects/led-animation/en/latest/api.html#adafruit_led_animation.animation.Animation
+        # https://learn.adafruit.com/cooperative-multitasking-in-circuitpython-with-asyncio?view=all
+        animations.animate()
+
+        # -----------------
+        prop_servo.step()
+
+
+song_decoder = sound.open_song_decoder()
+
 while True:
     loop += 1
     if verbose and (not loop % 100):
         print("Loop count: ", loop)
 
+    if play_arpy:  # the synth uses the audio output, so no songs
+        tick()
+        continue
+
     for filename in mp3files:
-        # ################################################
         # This allows you to do other things while the audio plays!
-        while True:  # audio.playing:
-            loop_inner += 1
-            if verbose and (not loop_inner % 100):
-                print("Inner Loop count: ", loop_inner)
-
-            # -----------------
-            # region Measure distance
-            if vl53.data_ready and (not loop_inner % 25):
-                if verbose:
-                    print("Distance: {} cm".format(vl53.distance))
-                vl53.clear_interrupt()
-            # endregion
-
-            # -----------------
-            # region Read LIS3DH values
-            history = x
-            x, y, z = sensors.read_acceleration(lis3dh)
-            if x == 0:
-                x = 0.000001
-            rel_chg = ((x - history) / x) * 100
-            # Gradient/slope/derivitive of recent values: are we de/accelorating?!
-            # https://numpy.org/doc/stable/reference/generated/numpy.gradient.html
-            # https://stackoverflow.com/a/24633888/6425926
-            # https://www.stevenhirsch.ca/python-derivative/
-
-            if verbose and lis3dh.tapped:
-                print("Tapped!")
-            if verbose and lis3dh.shake(shake_threshold=12):  # default 30 too high
-                print("Shaken!")
-            # endregion
-
-            # Above code always runs
-            # Code below only runs if mailbox lid is opened, to save battery
-            """
-            if not switch.value and switch_state is False:
-                external_power.value = False
-                switch_state = True
-            if switch.value and switch_state is True:
-                external_power.value = True
-                switch_state = False
-            """
-            mailbox_lid_open = True
-
-            external_power.switch_to_output(value=mailbox_lid_open)
-            if mailbox_lid_open:
-                # Mailbox is being used!!!
-
-                # -----------------
-                # region Check buttons/switches
-                """
-                position = encoder.position
-                if position != last_position:
-                    last_position = position
-                    if verbose:
-                        print(f"Position: {position}")
-                for b in range(5):
-                    if not buttons[b].value and button_states[b] is False:
-                        button_states[b] = True
-                        if verbose:
-                            print(f"{button_names[b]} button pressed")
-                    if buttons[b].value and button_states[b] is True:
-                        button_states[b] = False
-                        if verbose:
-                            print(f"{button_names[b]} button released")
-                """
-                # endregion
-
-                if play_arpy:
-                    arp_step(arpy)
-
-                # -----------------
-                # modify audio based on switches?
-                mixer.voice[0].level = 0.6
-
-                # -----------------
-                # Next step of the external neopixel animation
-                # How to make responsive animations???
-                # https://docs.circuitpython.org/projects/led-animation/en/latest/api.html#adafruit_led_animation.animation.Animation
-                # https://learn.adafruit.com/cooperative-multitasking-in-circuitpython-with-asyncio?view=all
-                animations.animate()
-
-                # -----------------
-                prop_servo.step()
-
-    if audio.playing is False:
-        print("play mp3[3]...")
-        decoder = open(sound_dir + mp3files[3], "rb")
-        audio.play(decoder)
-        print("DONE playing mp3[3]")
+        song = sound.play_song(audio, mixer, song_decoder, filename)
+        while song.playing:
+            tick()

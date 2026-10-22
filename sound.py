@@ -27,6 +27,9 @@ mp3_file2 = (
 )
 # https://freesound.org/people/f-r-a-g-i-l-e/sounds/476663/
 
+MIXER_SAMPLE_RATE = 22050
+MIXER_CHANNELS = 1
+
 
 def setup_audio():
     """Start I2S output through a mixer; returns (audio, mixer)"""
@@ -42,8 +45,8 @@ def setup_audio():
     # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather/audio-mixer-volume-control
     mixer = audiomixer.Mixer(
         voice_count=2,
-        channel_count=1,
-        sample_rate=22050,  # 8000,
+        channel_count=MIXER_CHANNELS,
+        sample_rate=MIXER_SAMPLE_RATE,  # 8000,
         #    buffer_size=2048,
         bits_per_sample=16,
         samples_signed=True,  # False,
@@ -58,6 +61,35 @@ def setup_audio():
     mixer.voice[1].play(mp3)
     mixer.voice[1].level = 0.4
     return audio, mixer
+
+
+def open_song_decoder():
+    """One MP3 decoder, reused for every song to save memory"""
+    return audiomp3.MP3Decoder(open(sound_dir + mp3files[0], "rb"))
+
+
+def play_song(audio, mixer, decoder, filename):
+    """Start a song; returns the object whose .playing goes False when it ends
+
+    The mixer only accepts songs that match its sample rate & channels.
+    Other songs play straight to the I2S output, without mixer volume control.
+    """
+    decoder.file = open(sound_dir + filename, "rb")
+    if verbose:
+        print(
+            "Playing", filename, decoder.sample_rate, "Hz,",
+            decoder.channel_count, "channel(s)",
+        )
+    if (
+        decoder.sample_rate == MIXER_SAMPLE_RATE
+        and decoder.channel_count == MIXER_CHANNELS
+    ):
+        if not audio.playing:
+            audio.play(mixer)  # reattach the mixer after a direct song
+        mixer.voice[0].play(decoder)
+        return mixer.voice[0]
+    audio.play(decoder)
+    return audio
 
 
 def make_sine_wave_sample(frequency=440, volume=0.1):
