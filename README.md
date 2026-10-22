@@ -40,10 +40,11 @@ of the mailbox disco in action!
   for updating the library, or go to https://Adafruit.com or
   https://CircuitPython.org for the latest instructions.)
 
-- Copy the `/lib/` and `/sounds/` directories, and the `main.py` file from the
-  same directory as you are reading this ReadMe.md file
-  (https://github.com/vashjuan/DiscoBox/ most likely) to the root directory of
-  the PropMaker.
+- Copy the `/lib/` and `/sounds/` directories, and all the `*.py` files
+  (`main.py`, `config.py`, `sensors.py`, `lights.py`, `sound.py`,
+  `prop_servo.py`, `arp_synth.py` and `arpy.py`) from the same directory as you
+  are reading this ReadMe.md file (https://github.com/vashjuan/DiscoBox/ most
+  likely) to the root directory of the PropMaker.
 
 ### Hardware
 
@@ -86,8 +87,17 @@ We don't use any of the additional libraries available in the Community Bundle:
 
 ## Updating Circuit Python
 
-Although tested with version 9.2.1, any recent version of the library should
-work.
+The libraries in `/lib/` are from the CircuitPython **10.x** bundle, so the
+PropMaker needs CircuitPython 10 (10.3.1 at last update). Update the firmware
+before copying `/lib/` over. (Earlier code was tested with 9.2.1.)
+
+To refresh the libraries, run [circup](https://github.com/adafruit/circup)
+against this folder (it reads the version from `boot_out.txt`):
+
+```powershell
+pip install --upgrade circup
+circup --path . update --all
+```
 
 1. Download the latest version of the \*.uf2 file from:
    [Feather RP2040 Prop-Maker Download](https://circuitpython.org/board/adafruit_feather_rp2040_prop_maker/)

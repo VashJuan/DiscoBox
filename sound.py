@@ -1,0 +1,153 @@
+# SPDX-FileCopyrightText: 2023 John Cornelison for Vashon Software
+# SPDX-License-Identifier: MIT
+
+"""Music & Audio: I2S output, mixer, and start-up audio tests"""
+
+# https://github.com/todbot/circuitpython-tricks#audio
+
+import time
+import array
+import math
+
+import board
+from audiocore import RawSample
+import audiocore  # for WAV files
+import audiobusio  # for I2S audio with external I2S DAC board
+import audiomixer
+import audiomp3
+import synthio
+
+from config import verbose, sound_dir, mp3files
+
+wav_file2 = "sounds/amenfull_22k_s16.wav"
+# in 'circuitpython-tricks/larger-tricks/breakbeat_wavs'
+mp3_file2 = (
+    "sounds/One_Day-22Hz-16kbpsConst.mp3"
+    # in 'circuitpython-tricks/larger-tricks/wav'
+)
+# https://freesound.org/people/f-r-a-g-i-l-e/sounds/476663/
+
+
+def setup_audio():
+    """Start I2S output through a mixer; returns (audio, mixer)"""
+    # i2s audio playback on PropMaker Feather RP2040
+    audio = audiobusio.I2SOut(
+        board.I2S_BIT_CLOCK, board.I2S_WORD_SELECT, board.I2S_DATA
+    )  # aka DAC!
+    # audio = audioio.AudioOut(board.RX) # Used on boards without I2S audio
+    # dac = audioio.AudioOut(board.SPEAKER)
+
+    # Using mixer just to enable volume control
+    # channel1 is mp3, channel 2 will be used for synth sounds
+    # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather/audio-mixer-volume-control
+    mixer = audiomixer.Mixer(
+        voice_count=2,
+        channel_count=1,
+        sample_rate=22050,  # 8000,
+        #    buffer_size=2048,
+        bits_per_sample=16,
+        samples_signed=True,  # False,
+    )
+    # mixer = audiomixer.Mixer(channel_count=2, sample_rate=22050, buffer_size=2048)
+    audio.play(mixer)  # attach mixer to audio playback
+
+    wave = audiocore.WaveFile(open(wav_file2, "rb"))
+    mp3 = audiomp3.MP3Decoder(open(mp3_file2, "rb"))
+    mixer.voice[0].play(wave)
+    mixer.voice[0].level = 0.4
+    mixer.voice[1].play(mp3)
+    mixer.voice[1].level = 0.4
+    return audio, mixer
+
+
+def make_sine_wave_sample(frequency=440, volume=0.1):
+    """Simple tone sample"""
+    # https://github.com/todbot/circuitpython-tricks#making-simple-tones
+    length = 1000 // frequency
+    sine_wave = array.array("H", [0] * length)
+    for i in range(length):
+        sine_wave[i] = int(
+            (1 + math.sin(math.pi * 2 * i / length)) * volume * (2**15 - 1)
+        )
+    return RawSample(sine_wave)
+
+
+def play_test_sounds(audio, mixer):
+    """Load and try out each kind of audio source"""
+    for f in (262, 294, 330, 349, 392, 440, 494, 523):
+        if verbose:
+            print("play ", f, " MHz tone...")
+        # simpleio.tone(board.SPEAKER, f, 0.25)
+        time.sleep(0.5)
+
+    # ######## Get MP3 file
+    # https://github.com/todbot/circuitpython-tricks#playing-mp3-files
+    # You have to specify some mp3 file when creating the decoder
+    mp3_file = open(sound_dir + mp3files[0], "rb")
+    mp3_stream = audiomp3.MP3Decoder(mp3_file)  # Create object only once to save memory
+    if verbose:
+        bps = mp3_stream.bits_per_sample  # 16
+        sr = mp3_stream.sample_rate  # 44100
+        print("mp3_stream bps:", bps, " sample rate:", sr)
+
+    # ####### Get WAV file
+    # https://github.com/todbot/circuitpython-tricks#preparing-audio-files-for-circuitpython
+    # Play a WAV file (e.g., from
+    # https://github.com/KristofferKarlAxelEkstrand/AKWF-FREE,
+    # https://WaveEditOnline.com)
+    wav_song = audiocore.WaveFile(open(sound_dir + "bowing.wav", "rb"))  # 16 & 44100
+    if verbose:
+        bps = wav_song.bits_per_sample  # 16
+        sr = wav_song.sample_rate  # 44100
+        print("WAV song bps:", bps, " sample rate:", sr)
+
+    # ######## Play Midi
+    # https://github.com/todbot/circuitpython-tricks#usb-midi
+    # https://docs.circuitpython.org/en/latest/shared-bindings/synthio/index.html#synthio.MidiTrack
+    melody = synthio.MidiTrack(
+        b"\0\x90H\0*\x80H\0\6\x90J\0*\x80J\0\6\x90L\0*\x80L\0\6\x90J\0"
+        + b"*\x80J\0\6\x90H\0*\x80H\0\6\x90J\0*\x80J\0\6\x90L\0T\x80L\0"
+        + b"\x0c\x90H\0T\x80H\0\x0c\x90H\0T\x80H\0",
+        tempo=640,
+    )
+    if verbose:
+        bps = "undefined"  # melody.bits_per_sample
+        sr = melody.sample_rate  # 11025
+        print("midi melody bps:", bps, " sample rate:", sr)
+        print("play midi melody")
+        audio.play(melody)
+        while audio.playing:
+            pass
+        print("play midi melody DONE")
+
+    # #### Get Midi file
+    # https://bitmidi.com/, https://midisfree.com,
+    # https://musiclab.chromeexperiments.com/Song-Maker/,
+    # data = open(sound_dir + "lonely.mid", "rb")
+    # midi = synthio.from_file(data)
+    # audio.play(midi)  # mixer needs samples_signed=True
+
+    # ####### Create Synth
+    # synth = synthio.Synthesizer(channel_count=1, sample_rate=22050)
+    synth = synthio.Synthesizer(channel_count=1, sample_rate=9990)
+    if verbose:
+        bps = "undefined"  # synth.bits_per_sample
+        sr = synth.sample_rate  # 9990
+        print("Synth sample bps:", bps, " sample rate:", sr)
+
+    # ###### Create sine wave sample
+    sine_wave_sample = make_sine_wave_sample()
+    if verbose:
+        bps = "undefined"  # sine_wave_sample.bits_per_sample
+        sr = sine_wave_sample.sample_rate  # 8000
+        print("sine_wave_sample sample bps:", bps, " sample rate:", sr)
+
+    # ######### Play some of the above...
+    # mixer.voice[0].play(synth)  # requires mixer samples_signed=True
+    print("sine_wavesample rate: ", sine_wave_sample.sample_rate)  # 8000
+    mixer.voice[1].play(sine_wave_sample)  # requires signed_samples=False ...
+    # The sample's sample rate does not match the mixer's
+    mixer.voice[1].level = 0.4
+    if verbose:
+        print("Mixer voice 1 playing...")
+    time.sleep(1)
