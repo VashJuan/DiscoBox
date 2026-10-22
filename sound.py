@@ -10,6 +10,7 @@ import array
 import math
 
 import board
+import microcontroller
 from audiocore import RawSample
 import audiocore  # for WAV files
 import audiobusio  # for I2S audio with external I2S DAC board
@@ -31,7 +32,7 @@ MIXER_SAMPLE_RATE = 22050
 MIXER_CHANNELS = 1
 
 
-def setup_audio():
+def setup_audio(test_clips=True):
     """Start I2S output through a mixer; returns (audio, mixer)"""
     # i2s audio playback on PropMaker Feather RP2040
     audio = audiobusio.I2SOut(
@@ -53,6 +54,9 @@ def setup_audio():
     )
     # mixer = audiomixer.Mixer(channel_count=2, sample_rate=22050, buffer_size=2048)
     audio.play(mixer)  # attach mixer to audio playback
+    mixer.voice[0].level = 0.6
+    if not test_clips:
+        return audio, mixer
 
     wave = audiocore.WaveFile(open(wav_file2, "rb"))
     mp3 = audiomp3.MP3Decoder(open(mp3_file2, "rb"))
@@ -66,6 +70,26 @@ def setup_audio():
 def open_song_decoder():
     """One MP3 decoder, reused for every song to save memory"""
     return audiomp3.MP3Decoder(open(sound_dir + mp3files[0], "rb"))
+
+
+def first_song_index():
+    """Song to start with, kept in nvm so each door opening starts a new song
+
+    Opening the door powers the board up, so RAM can't remember the last song.
+    Erased nvm reads 0xFF, which is out of range, so that starts at song 0.
+    """
+    index = microcontroller.nvm[0]
+    return index if index < len(mp3files) else 0
+
+
+def remember_next_song(index):
+    """Store the song after this one, as soon as this one starts
+
+    Flash wears out after ~100,000 writes; one write per song is fine.
+    """
+    next_index = (index + 1) % len(mp3files)
+    if microcontroller.nvm[0] != next_index:
+        microcontroller.nvm[0] = next_index
 
 
 def play_song(audio, mixer, decoder, filename):

@@ -3,8 +3,11 @@
 
 """Disco Mailbox settings shared by all modules"""
 
-verbose = True  # print debug information to serial port
-# verbose = False   # no debug information to serial port
+# production: fast start-up, music first, no audio tests or debug printing
+production = True
+# production = False  # run the start-up audio tests & print debug information
+
+verbose = not production  # print debug information to serial port
 
 sound_dir = "sounds/"
 # 22050 Hz mono copies, to match the mixer (originals kept alongside)

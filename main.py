@@ -6,7 +6,7 @@
 # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather
 
 # Modules in this folder:
-#   config.py      settings (verbose, sound files, play_arpy)
+#   config.py      settings (production, verbose, sound files, play_arpy)
 #   sensors.py     VL53L1X distance sensor & LIS3DH accelerometer
 #   lights.py      onboard status LED & external NeoPixel animations
 #   prop_servo.py  servo sweep
@@ -17,24 +17,49 @@
 # TODO: https://learn.adafruit.com/
 # keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup
 
+import time
+
 import board
 from digitalio import DigitalInOut
 
-from config import verbose, mp3files, play_arpy
-import sensors
-import lights
+from config import verbose, production, mp3files, play_arpy
 import sound
-from prop_servo import ServoSweep
 
-print("Disco Mailbox - RP2040 Prop-Maker Feather has imported libraries")
 
-led = lights.setup_status_led()
+def timing(label):
+    """Seconds since power-up (time.monotonic() starts at boot)"""
+    print("{:.2f} s: {}".format(time.monotonic(), label))
+
+
+timing("main.py started")
 
 #################################################
-# provide power to the external components
+# provide power to the external components (speaker amp, NeoPixels, servo)
 sleeping = True
 external_power = DigitalInOut(board.EXTERNAL_POWER)
 external_power.switch_to_output(value=not sleeping)
+
+#################################################
+# Music first: start a song before loading the (slow) animation libraries
+audio, mixer = sound.setup_audio(test_clips=not production)
+if not (production or play_arpy):
+    sound.play_test_sounds(audio, mixer)
+
+song_index = sound.first_song_index()
+song_decoder = sound.open_song_decoder()
+song = None
+if not play_arpy:
+    song = sound.play_song(audio, mixer, song_decoder, mp3files[song_index])
+    sound.remember_next_song(song_index)
+    timing("first song started")
+
+import sensors  # pylint: disable=wrong-import-position
+import lights  # pylint: disable=wrong-import-position
+from prop_servo import ServoSweep  # pylint: disable=wrong-import-position
+
+timing("libraries imported")
+
+led = lights.setup_status_led()
 
 #################################################
 # region Enable rotary encoder (or other button/switch)
@@ -83,20 +108,16 @@ button_states = [False, False, False, False, False]
 # Set up the hardware
 vl53 = sensors.setup_tof(i2c)
 prop_servo = ServoSweep()
-print("Disco Mailbox - button, rotary encoder, switch ToF & servo setup")
 animations = lights.setup_animations()
 lis3dh = sensors.setup_accelerometer()
+timing("sensors, servo & lights set up")
 
-audio, mixer = sound.setup_audio()
 if play_arpy:
     from arp_synth import setup_arpy, arp_step
 
     audio, mixer, arpy = setup_arpy(led)
-else:
-    sound.play_test_sounds(audio, mixer)
 
 # ################################################
-loop = 0
 loop_inner = 0
 mailbox_lid_open = False
 x = 0
@@ -191,19 +212,14 @@ def tick():
         prop_servo.step()
 
 
-song_decoder = sound.open_song_decoder()
-
 while True:
-    loop += 1
-    if verbose and (not loop % 100):
-        print("Loop count: ", loop)
-
     if play_arpy:  # the synth uses the audio output, so no songs
         tick()
         continue
 
-    for filename in mp3files:
-        # This allows you to do other things while the audio plays!
-        song = sound.play_song(audio, mixer, song_decoder, filename)
-        while song.playing:
-            tick()
+    # This allows you to do other things while the audio plays!
+    while song.playing:
+        tick()
+    song_index = (song_index + 1) % len(mp3files)
+    song = sound.play_song(audio, mixer, song_decoder, mp3files[song_index])
+    sound.remember_next_song(song_index)

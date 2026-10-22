@@ -46,6 +46,12 @@ of the mailbox disco in action!
   are reading this ReadMe.md file (https://github.com/vashjuan/DiscoBox/ most
   likely) to the root directory of the PropMaker.
 
+- `production = True` in `config.py` gives a fast start-up: the first song
+  starts about 0.1 s after `main.py` runs, before the lights and sensors are set
+  up. Set it to `False` to run the start-up audio tests and print debug
+  information. Each power-up starts with the next song in the list (the song
+  number is kept in the board's `nvm` memory).
+
 ### Hardware
 
 This is a Circuit Python script, derived from Adafruit's PropMaker example &
