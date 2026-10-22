@@ -17,10 +17,12 @@
 import time
 import array
 import math
-# , analogio, keypad
+import analogio
+import keypad
 
 from random import randrange
 import ulab.numpy as np  # numerical approximation methods
+
 # import _asyncio
 # import adafruit_ticks
 from audiocore import RawSample
@@ -32,6 +34,7 @@ import audiopwmio
 import synthio
 import simpleio
 import audiomp3
+
 # from audiomp3 import MP3Decoder
 # import digitalio
 from digitalio import DigitalInOut, Pull
@@ -48,6 +51,7 @@ except ImportError:
 import adafruit_vl53l1x  # "Time of flight", i.e., distance sensor
 import adafruit_lis3dh  # accelerometer
 import board
+
 # from adafruit_seesaw import seesaw, rotaryio, digitalio  # Adafruit ANO Rotary Encoder
 from adafruit_motor import servo
 
@@ -63,6 +67,7 @@ from adafruit_led_animation.animation.chase import Chase
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import helper
+
 # from adafruit_led_animation.color import PURPLE, JADE, AMBER
 import adafruit_led_animation.color as color  # now we can use color.RED, etc.
 from arpy import Arpy  # Uses arpeggios class:
@@ -201,7 +206,7 @@ vl53.start_ranging()
 
 #################################################
 # region Enable servo motor
-pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2 ** 15, frequency=50)
+pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2**15, frequency=50)
 prop_servo = servo.Servo(pwm)
 angle = 0
 angle_plus = True
@@ -319,9 +324,9 @@ mp3_file2 = (
 wave = audiocore.WaveFile(open(wav_file2, "rb"))
 mp3 = audiomp3.MP3Decoder(open(mp3_file2, "rb"))
 mixer.voice[0].play(wave)
-mixer.voice[0].level = 0.6
+mixer.voice[0].level = 0.4
 mixer.voice[1].play(mp3)
-mixer.voice[1].level = 0.6
+mixer.voice[1].level = 0.4
 
 play_arpy = False
 
@@ -381,14 +386,14 @@ if True:
     # data = open(sound_dir + "lonely.mid", "rb")
     # midi = synthio.from_file(data)
     # if False:
-        # bps = "undefined"  # midi.bits_per_sample
-        # sr = midi.sample_rate  # 11025
-        # print("midi file bps:", bps, " sample rate:", sr)
-        # print("Play midi file")
-        # audio.play(midi)  # mixer needs samples_signed=True
-        # while audio.playing:
-            # pass
-        # print("Play midi file DONE")
+    # bps = "undefined"  # midi.bits_per_sample
+    # sr = midi.sample_rate  # 11025
+    # print("midi file bps:", bps, " sample rate:", sr)
+    # print("Play midi file")
+    # audio.play(midi)  # mixer needs samples_signed=True
+    # while audio.playing:
+    # pass
+    # print("Play midi file DONE")
 
     # ####### Create Synth
     # synth = synthio.Synthesizer(channel_count=1, sample_rate=22050)
@@ -406,7 +411,7 @@ if True:
     sine_wave = array.array("H", [0] * length)
     for i in range(length):
         sine_wave[i] = int(
-            (1 + math.sin(math.pi * 2 * i / length)) * TONE_VOLUME * (2 ** 15 - 1)
+            (1 + math.sin(math.pi * 2 * i / length)) * TONE_VOLUME * (2**15 - 1)
         )
     sine_wave_sample = RawSample(sine_wave)
     if verbose:
@@ -417,7 +422,7 @@ if True:
         # mixer.music.play(-1)  # will cause song to loop
 
     # ######### Play some of the above...
-    if False:
+    if True:
         # audio.play(mixer)
 
         """
@@ -430,9 +435,7 @@ if True:
         # audio.play(sine_wave_sample, loop=True)
         print("sine_wavesample rate: ", sine_wave_sample.sample_rate)  # 8000
 
-        mixer.voice[1].play(
-            sine_wave_sample
-        )  # requires signed_samples=False ...
+        mixer.voice[1].play(sine_wave_sample)  # requires signed_samples=False ...
         # The sample's sample rate does not match the mixer's
         mixer.voice[1].level = 0.4
         if verbose:
@@ -673,9 +676,9 @@ while True:
                 # -----------------
                 # modify audio based on switches?
                 # print (-100%8) 4
-                mixer.voice[
-                    0
-                ].level = 0.6  # (mixer.voice[0].level - 0.1) % 0.4  # reduce
+                mixer.voice[0].level = (
+                    0.6  # (mixer.voice[0].level - 0.1) % 0.4  # reduce
+                )
 
                 """
                 synth.press((65, 69, 72))  # midi note 65 = F4
@@ -748,4 +751,6 @@ while True:
         audio.play(decoder)
         # sample_number = (sample_number + 1) % 10
         print("DONE playing mp3[3]")
+    # enable.value = audio.playing
+    # enable = speaker pin gets enabled to play
     # enable.value = audio.playing enable = speaker pin gets enabled to play

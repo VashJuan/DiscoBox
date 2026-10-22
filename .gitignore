@@ -33,3 +33,5 @@ Thumbs.db
 /.fseventsd
 .metadata_never_index
 /.Trashes
+# Windows drive metadata
+System Volume Information/

@@ -9,9 +9,11 @@
         "reportShadowedImports": "none"
     },
     "python.analysis.extraPaths": [
-        "",
-        "c:\\Users\\John\\.vscode-insiders\\extensions\\wmerkens.vscode-circuitpython-v2-0.3.0\\stubs",
+        "c:\\Users\\John\\.vscode-insiders\\extensions\\wmerkens.vscode-circuitpython-v2-0.3.1\\boards\\0x239A\\0x8132",
+        "c:\\Users\\John\\.vscode-insiders\\extensions\\wmerkens.vscode-circuitpython-v2-0.3.1\\stubs",
         "c:\\Users\\John\\AppData\\Roaming\\Code - Insiders\\User\\globalStorage\\wmerkens.vscode-circuitpython-v2\\bundle\\20241221\\adafruit-circuitpython-bundle-py-20241221\\lib"
     ],
-    "circuitpython.board.version": "CircuitPython"
+    "circuitpython.board.version": "CircuitPython",
+    "circuitpython.board.vid": "0x239A",
+    "circuitpython.board.pid": "0x8132"
 }
