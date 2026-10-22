@@ -167,7 +167,9 @@ Ideas for new effects, and what has been tried, are in [IDEAS.md](IDEAS.md).
   (`main.py`, `config.py`, `sensors.py`, `lights.py`, `sound.py`,
   `prop_servo.py`, `creak.py`, `arp_synth.py` and `arpy.py`) from the same directory as you
   are reading this ReadMe.md file (https://github.com/vashjuan/DiscoBox/ most
-  likely) to the root directory of the PropMaker.
+  likely) to the root directory of the PropMaker. Copy nothing else (test
+  scripts, README, editor files): the board has only 7 MB, so keep it free of
+  cruft.
 
 - Check the settings in `config.py` (see [Settings](#settings-configpy) above).
   Leave `production = True` for the mailbox.
@@ -216,6 +218,13 @@ We don't use any of the additional libraries available in the Community Bundle:
 The libraries in `/lib/` are from the CircuitPython **10.x** bundle, so the
 PropMaker needs CircuitPython 10 (10.3.1 at last update). Update the firmware
 before copying `/lib/` over. (Earlier code was tested with 9.2.1.)
+
+`/lib/` holds only the libraries the code imports, plus what those need:
+`adafruit_led_animation`, `neopixel` and `adafruit_pixelbuf`, `adafruit_motor`,
+`adafruit_lis3dh`, `adafruit_vl53l1x` and `adafruit_bus_device`. Unused ones
+(debouncer, ticks, ht16k33, midi, seesaw, wave, simpleio) were moved to
+`DiscoBox_References\Removed from board 2026-10-22\lib`. Add `adafruit_seesaw`
+back if you turn on the rotary encoder in `main.py`.
 
 To refresh the libraries, run [circup](https://github.com/adafruit/circup)
 against this folder (it reads the version from `boot_out.txt`):
