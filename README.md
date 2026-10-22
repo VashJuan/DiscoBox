@@ -81,8 +81,8 @@ effects below run at the same time.
 ### Servo (`prop_servo.py`)
 
 - A servo on the servo header sweeps from 0° to 180° and back, 5° every 0.03 s
-  (about 1 s each way). It can drive any small prop. (At 5° every 0.2 s it was
-  too slow and quiet to notice.)
+  (about 1 s each way). It can drive any small prop. (At 5° every 0.2 s the
+  servo did not move, though the code was stepping it; cause unknown.)
 
 ### Sensors
 

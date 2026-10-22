@@ -13,7 +13,7 @@ from adafruit_motor import servo
 class ServoSweep:
     """Move the servo back and forth, 5 degrees per step"""
 
-    step_interval = 0.03  # seconds per 5 degree step: ~1 s per sweep (0.2 was too slow to hear)
+    step_interval = 0.03  # seconds per 5 degree step: ~1 s per sweep (at 0.2 it didn't move; cause unknown)
 
     def __init__(self):
         pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2**15, frequency=50)
