@@ -93,15 +93,13 @@ def play_song(audio, mixer, decoder, filename):
 
 
 def make_sine_wave_sample(frequency=440, volume=0.1):
-    """Simple tone sample"""
+    """Simple tone sample, signed & at the mixer's sample rate so the mixer takes it"""
     # https://github.com/todbot/circuitpython-tricks#making-simple-tones
-    length = 1000 // frequency
-    sine_wave = array.array("H", [0] * length)
+    length = MIXER_SAMPLE_RATE // frequency
+    sine_wave = array.array("h", [0] * length)
     for i in range(length):
-        sine_wave[i] = int(
-            (1 + math.sin(math.pi * 2 * i / length)) * volume * (2**15 - 1)
-        )
-    return RawSample(sine_wave)
+        sine_wave[i] = int(math.sin(math.pi * 2 * i / length) * volume * (2**15 - 1))
+    return RawSample(sine_wave, sample_rate=MIXER_SAMPLE_RATE)
 
 
 def play_test_sounds(audio, mixer):
@@ -176,10 +174,11 @@ def play_test_sounds(audio, mixer):
 
     # ######### Play some of the above...
     # mixer.voice[0].play(synth)  # requires mixer samples_signed=True
-    print("sine_wavesample rate: ", sine_wave_sample.sample_rate)  # 8000
-    mixer.voice[1].play(sine_wave_sample)  # requires signed_samples=False ...
-    # The sample's sample rate does not match the mixer's
+    print("sine_wavesample rate: ", sine_wave_sample.sample_rate)  # 22050
+    audio.play(mixer)  # reattach the mixer; the melody played straight to I2S
+    mixer.voice[1].play(sine_wave_sample, loop=True)
     mixer.voice[1].level = 0.4
     if verbose:
         print("Mixer voice 1 playing...")
     time.sleep(1)
+    mixer.voice[1].stop()
