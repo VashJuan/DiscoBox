@@ -34,18 +34,34 @@ yet. Mark each one as tried, kept or dropped, with the date and a short note.
 Voice clips: record them or use text-to-speech; save as 22050 Hz mono 16-bit WAV
 in `sounds/`.
 
-In/out detection only works if the sensor points down into the box (see
-Questions for John.md).
+**Layout (John, 2026-10-22):** sensor, lights and speaker at the back of the
+box, facing the front door. So the sensor measures across the box, not down at
+the pile. Ideas for in/out with that layout, to test:
+
+- Empty box, door open: long reading (or out of range). Mail lying in the beam,
+  or a parcel, gives a shorter settled reading. Mount the sensor low and tilt
+  it slightly down so the beam crosses the floor; flat letters may still be
+  too thin to see.
+- The hand or mail moving through the beam is visible either way, so the
+  whistle can play for both in and out even if telling them apart fails.
 
 ## Door angle (accelerometer)
 
 | Idea | How | Status |
 | --- | --- | --- |
-| Cartoon creak | Pitch follows how fast the door swings | idea |
+| Cartoon creak | Pitch, rasp & volume follow how fast the door swings (`creak.py`, `door_creak` in `config.py`) | built 2026-10-22, untested by ear |
 | Volume knob | Wider open = louder song (`voice[0].level`) | idea |
 | Light control | Angle sets NeoPixel color, brightness or animation speed | idea |
+| Creak on closing | The board stays powered until the door shuts, so the closing swing creaks too | comes with the creak |
 | Grand entrance | Rising "ta-daaa" sweep as the door opens | idea |
 | Door as instrument | Angle sets synth pitch or filter, so swinging the door plays notes | idea |
+
+## Lights
+
+The lights face the front from the back of the box, so most people see the
+glow, not the pattern, unless they crouch and look in. Favour effects that read
+as **shifting color and brightness**: slow color washes, brightness pulses on
+events (mail, door swing), a color per song.
 
 ## Ways to vary it over time
 

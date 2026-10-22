@@ -42,7 +42,7 @@ of the mailbox disco in action!
 
 - Copy the `/lib/` and `/sounds/` directories, and all the `*.py` files
   (`main.py`, `config.py`, `sensors.py`, `lights.py`, `sound.py`,
-  `prop_servo.py`, `arp_synth.py` and `arpy.py`) from the same directory as you
+  `prop_servo.py`, `creak.py`, `arp_synth.py` and `arpy.py`) from the same directory as you
   are reading this ReadMe.md file (https://github.com/vashjuan/DiscoBox/ most
   likely) to the root directory of the PropMaker.
 

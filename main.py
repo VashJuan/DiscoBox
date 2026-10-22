@@ -11,6 +11,7 @@
 #   lights.py      onboard status LED & external NeoPixel animations
 #   prop_servo.py  servo sweep
 #   sound.py       I2S audio, mixer & start-up audio tests
+#   creak.py       cartoon door creak (when door_creak is True)
 #   arp_synth.py   Arpy arpeggiator synth (when play_arpy is True)
 #   arpy.py        Arpy arpeggio class
 
@@ -22,7 +23,7 @@ import time
 import board
 from digitalio import DigitalInOut
 
-from config import verbose, production, mp3files, play_arpy
+from config import verbose, production, mp3files, play_arpy, door_creak
 import sound
 
 
@@ -117,6 +118,12 @@ if play_arpy:
 
     audio, mixer, arpy = setup_arpy(led)
 
+creak = None
+if door_creak and not play_arpy:
+    from creak import DoorCreak
+
+    creak = DoorCreak(mixer)
+
 # ################################################
 loop_inner = 0
 mailbox_lid_open = False
@@ -156,6 +163,8 @@ def tick():
     # animations; check the reading we already have instead (12 m/s^2 ~ 1.22 G)
     if verbose and (x * x + y * y + z * z) > 1.22**2:
         print("Shaken!")
+    if creak:
+        creak.update(x, y, z)
     # endregion
 
     # Above code always runs
