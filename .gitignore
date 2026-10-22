@@ -35,3 +35,4 @@ Thumbs.db
 /.Trashes
 # Windows drive metadata
 System Volume Information/
+__pycache__/
