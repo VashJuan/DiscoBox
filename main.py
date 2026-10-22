@@ -131,7 +131,9 @@ def tick():
 
     if verbose and lis3dh.tapped:
         print("Tapped!")
-    if verbose and lis3dh.shake(shake_threshold=12):  # default 30 too high
+    # lis3dh.shake() averages readings over a 0.1 s sleep, which stalled the
+    # animations; check the reading we already have instead (12 m/s^2 ~ 1.22 G)
+    if verbose and (x * x + y * y + z * z) > 1.22**2:
         print("Shaken!")
     # endregion
 

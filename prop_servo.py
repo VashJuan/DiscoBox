@@ -3,6 +3,8 @@
 
 """Servo motor on the Prop-Maker's servo header"""
 
+import time
+
 import board
 import pwmio
 from adafruit_motor import servo
@@ -11,13 +13,20 @@ from adafruit_motor import servo
 class ServoSweep:
     """Move the servo back and forth, 5 degrees per step"""
 
+    step_interval = 0.2  # seconds between steps, so speed doesn't follow the loop rate
+
     def __init__(self):
         pwm = pwmio.PWMOut(board.EXTERNAL_SERVO, duty_cycle=2**15, frequency=50)
         self.servo = servo.Servo(pwm)
         self.angle = 0
         self.angle_plus = True
+        self.last_step = 0
 
     def step(self):
+        now = time.monotonic()
+        if now - self.last_step < self.step_interval:
+            return
+        self.last_step = now
         self.servo.angle = self.angle
         if self.angle_plus:
             self.angle += 5
