@@ -14,6 +14,115 @@ To see what this application does, browse to
 [https://YouTube.com/](https://YouTube.com/). In the future we'll put up a video
 of the mailbox disco in action!
 
+## What it does
+
+The Prop-Maker Feather is mounted on the mailbox door and only has power while
+the door is open. Opening the door starts the show; closing it ends it. All the
+effects below run at the same time.
+
+### Music
+
+- A song starts about 0.1 s after power-up, before the lights and sensors are
+  set up, so the carrier hears something straight away.
+- Each power-up starts with the **next** song in the list, so the carrier gets
+  a different song each day. The song number is kept in the board's `nvm`
+  memory, which survives power-off.
+- If the door stays open, the songs play one after another and loop back to the
+  start.
+- The playlist (`mp3files` in `config.py`, files in `/sounds/`):
+
+  | Song | Length |
+  | --- | --- |
+  | `ClassicalGas_22k.mp3` | 90 s, fades out |
+  | `happy_22k.mp3` | 12 s |
+  | `Fire_22k.mp3` | 90 s, fades out |
+  | `slow_22k.mp3` | 6 s |
+  | `Africa_22k.mp3` | 90 s, fades out |
+  | `OneDay_22k.mp3` | 90 s, fades out |
+
+- Songs are 22050 Hz mono MP3s so they go through the audio mixer (song volume
+  0.6), which lets effects such as the door creak play over them. A song in any
+  other format still plays, but straight to the speaker, with no volume control
+  and no effects over it. The full-length originals are in the separate
+  `DiscoBox_References\sounds` folder.
+
+### Cartoon door creak (`creak.py`)
+
+- A raspy, buzzy synth tone plays over the song while the door swings, opening
+  or closing.
+- The accelerometer on the Feather sees the direction of gravity turn as the
+  door swings. The faster it turns, the higher, raspier and louder the creak:
+
+  | Door swing | Creak |
+  | --- | --- |
+  | under 20°/s (still) | silent |
+  | 20°/s | 55 Hz, 12 clicks/s, quiet (volume 0.2) |
+  | 200°/s or faster | 140 Hz, 35 clicks/s, loud (volume 0.9) |
+
+- No calibration is needed; it works whichever way the board is mounted.
+- The tuning numbers are at the top of `creak.py`. Turn the creak off with
+  `door_creak = False` in `config.py`.
+- Status: built, not yet tuned by ear on the real door.
+
+### Lights (`lights.py`)
+
+- The external 8x8 NeoPixel panel (64 LEDs, brightness 5%) runs a sequence of
+  rainbow animations, changing every 5 seconds in random order:
+  - **Rainbow** – the whole rainbow scrolls across the columns
+  - **Rainbow comet** – a rainbow streak bounces back and forth
+  - **Rainbow chase (columns)** – rainbow bands march across the panel
+  - **Rainbow chase (pixels)** – small rainbow groups chase along every pixel
+  - **Rainbow sparkle** – random pixels sparkle over a rainbow
+- Purple and amber comets and a jade chase are also defined in `lights.py`, but
+  are switched off in the sequence.
+- The panel sits at the back of the box facing the door, so from outside it
+  mostly reads as a shifting glow of colour.
+
+### Servo (`prop_servo.py`)
+
+- A servo on the servo header sweeps slowly from 0° to 180° and back, 5° every
+  0.2 s (about 7 s each way). It can drive any small prop.
+
+### Sensors
+
+- **Accelerometer (LIS3DH, on the Feather):** drives the door creak. In debug
+  mode it also prints "Tapped!" and "Shaken!".
+- **Distance sensor (VL53L1X):** measures up to about 1.3 m, about 10 times a
+  second. For now the reading is only printed in debug mode; mail-in and
+  mail-out effects are planned (see [IDEAS.md](IDEAS.md)).
+
+### Arpeggiator mode (experimental)
+
+- With `play_arpy = True` in `config.py`, the songs and creak are replaced by
+  an 80s-style synth arpeggio (`arp_synth.py`, `arpy.py`) whose root note,
+  tempo and pattern change at random, and the Feather's own LED changes colour
+  with each note. This mode sends audio to the RX pin, not the speaker
+  terminals, so it is for experimenting only.
+
+### Settings (`config.py`)
+
+| Setting | What it does |
+| --- | --- |
+| `production` | `True`: fast start, music first, no debug printing. `False`: play the start-up audio tests first and print debug information to the serial console. |
+| `mp3files` | The playlist, in order. |
+| `door_creak` | `True` to play the door creak. |
+| `play_arpy` | `True` for the arpeggiator instead of songs. |
+
+### Code layout
+
+| File | Purpose |
+| --- | --- |
+| `main.py` | Starts the music, sets up the hardware, then runs the main loop |
+| `config.py` | Settings |
+| `sound.py` | Speaker output, mixer, playlist & start-up audio tests |
+| `creak.py` | Door creak |
+| `lights.py` | NeoPixel animations |
+| `prop_servo.py` | Servo sweep |
+| `sensors.py` | Distance sensor & accelerometer |
+| `arp_synth.py`, `arpy.py` | Arpeggiator mode |
+
+Ideas for new effects, and what has been tried, are in [IDEAS.md](IDEAS.md).
+
 ### Installation
 
 ![alt text](non-dist-imgs/DiscoBox-Assembled.jpg)
@@ -46,11 +155,8 @@ of the mailbox disco in action!
   are reading this ReadMe.md file (https://github.com/vashjuan/DiscoBox/ most
   likely) to the root directory of the PropMaker.
 
-- `production = True` in `config.py` gives a fast start-up: the first song
-  starts about 0.1 s after `main.py` runs, before the lights and sensors are set
-  up. Set it to `False` to run the start-up audio tests and print debug
-  information. Each power-up starts with the next song in the list (the song
-  number is kept in the board's `nvm` memory).
+- Check the settings in `config.py` (see [Settings](#settings-configpy) above).
+  Leave `production = True` for the mailbox.
 
 ### Hardware
 
@@ -73,7 +179,7 @@ It relies on (& tested with):
 
 - Solar panel
 
-- Solar panel charge controller with 3.7 volt 1500 Amp-hour Lithium Ion battery
+- Solar panel charge controller with 3.7 volt 1500 mAh Lithium Ion battery
 
 ### Libraries
 
@@ -167,7 +273,7 @@ the Feather is destroyed!""
 ### Public Feedback & Contribution
 
 We encourage your feedback and contributions to this repository. Content
-suggestions and discussions (specific to RangerTrak) can be communicated in the
+suggestions and discussions (specific to DiscoBox) can be communicated in the
 following ways:
 
 - GitHub “issues.” Each issue is a conversation about specific project work
@@ -182,7 +288,7 @@ following ways:
   in-browser editor to edit files and submit a pull request for your changes to
   be merged into the document. Directions on how to submit a pull request can be
   found on GitHub.
-- Send your content suggestions or proposed revisions to the RangerTrak team via
+- Send your content suggestions or proposed revisions to the DiscoBox team via
   email to disco@vashondesign.com
 
 ### Testimonials
