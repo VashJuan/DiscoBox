@@ -13,3 +13,9 @@
 - **Q3** (2026-10-22): How does the creak sound on a real door swing? Too
   loud, too quiet, too low or high, or does it creak when the door isn't
   moving? (Tuning numbers are at the top of creak.py.)
+  - 2026-10-22 (bench test, transducer, no song): quiet; sounds like static
+    under the song. Version A (creak.py, 55-140 Hz) sounds more like a creak;
+    version B (250-600 Hz, louder, wobbly) sounds like a voice. Silent when
+    the board is still. Undecided: tune further or pick another sound (Q4).
+- **Q4** (2026-10-22): Keep working on the creak, or replace it with a
+  different door sound (e.g. a recorded creak WAV, a slide whistle, a "boing")?

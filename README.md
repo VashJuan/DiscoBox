@@ -80,8 +80,9 @@ effects below run at the same time.
 
 ### Servo (`prop_servo.py`)
 
-- A servo on the servo header sweeps slowly from 0° to 180° and back, 5° every
-  0.2 s (about 7 s each way). It can drive any small prop.
+- A servo on the servo header sweeps from 0° to 180° and back, 5° every 0.03 s
+  (about 1 s each way). It can drive any small prop. (At 5° every 0.2 s it was
+  too slow and quiet to notice.)
 
 ### Sensors
 
@@ -120,6 +121,19 @@ effects below run at the same time.
 | `prop_servo.py` | Servo sweep |
 | `sensors.py` | Distance sensor & accelerometer |
 | `arp_synth.py`, `arpy.py` | Arpeggiator mode |
+| `test_creak.py`, `test_distance.py`, `test_servo.py` | Test one part on its own (see below) |
+
+### Testing one part at a time
+
+Copy a test script to the board as `code.py`; CircuitPython runs `code.py`
+instead of `main.py`. Each prints what it is doing to the serial console. Delete
+`code.py` from the board to go back to the normal show.
+
+| Script | What you should hear or see |
+| --- | --- |
+| `test_creak.py` | A beep, then pretend door swings, alternating the `creak.py` creak (1 beep first) with a higher, louder version (2 beeps first) |
+| `test_distance.py` | A beep, the I2C addresses found (VL53L1X = `0x29`), then a tone that rises as your hand gets closer |
+| `test_servo.py` | The servo moves to 0°, 90°, 180° and 90°, 2 s each, then sweeps |
 
 Ideas for new effects, and what has been tried, are in [IDEAS.md](IDEAS.md).
 
