@@ -6,7 +6,8 @@
 To run: copy this file to the board as code.py (it runs instead of main.py).
 Delete code.py from the board to go back to the normal show.
 
-Plays each sound in turn over a song turned down as the show ducks it, so they
+With a serial console connected it waits for a sound's number (1-5, then Enter);
+otherwise it plays each sound in turn over a song turned down as the show ducks it, so they
 can be judged outdoors against the music. All are synthesized (no sound files)
 and sit above ~300 Hz, where the transducer is loud. Beeps first tell which:
   1 beep:  squeak   - a high hinge "eeek", rising
@@ -18,10 +19,12 @@ and sit above ~300 Hz, where the transducer is loud. Beeps first tell which:
 
 import array
 import math
+import sys
 import time
 
 import board
 from digitalio import DigitalInOut
+import supervisor
 import synthio
 
 import sound
@@ -157,10 +160,32 @@ def cuckoo():
 
 SOUNDS = [squeak, doorbell, boing, ta_da, cuckoo]
 
-while True:
-    for number, effect in enumerate(SOUNDS, 1):
+
+def play_sound(number):
+    effect = SOUNDS[number - 1]
+    print(number, effect.__name__)
+    beeps(number)
+    effect()
+
+
+if supervisor.runtime.serial_connected:
+    # on demand: type a sound's number (1-5) and Enter in the serial console
+    print("Type 1-5 and Enter to play a sound")
+    line = ""
+    while True:
         keep_song_playing()
-        print(number, effect.__name__)
-        beeps(number)
-        effect()
+        if supervisor.runtime.serial_bytes_available:
+            char = sys.stdin.read(1)
+            if char in "\r\n":
+                if line.isdigit() and 1 <= int(line) <= len(SOUNDS):
+                    play_sound(int(line))
+                line = ""
+            else:
+                line += char
+        time.sleep(0.05)
+
+while True:
+    for number in range(1, len(SOUNDS) + 1):
+        keep_song_playing()
+        play_sound(number)
         time.sleep(PAUSE)
