@@ -62,6 +62,7 @@ SQUARE = wave(lambda p: 1 if p < 0.5 else -1)
 RAMP_UP = array.array("h", [0, 32767])  # LFO shape: 0 to 1 once
 # short pulses on the volume make a stick-slip "rasp"
 CLICKS = array.array("h", [32767, 20000, 0, 0, 0, 0])
+CROAK = array.array("h", [32767, 32767, 32767, 0])  # mostly on: a loud rasp
 # a few harmonics, for a brighter bell than a pure sine
 BELL = wave(
     lambda p: (
@@ -191,18 +192,20 @@ class Frog(Repeats):
     """Ribbit: two raspy croaks that rise a little"""
 
     COUNT = 2
-    EVERY = 0.25
+    EVERY = 0.35
+    TAIL = 0.3
 
     def make_note(self):
+        # each croak holds until the next starts (or the tail ends)
         return synthio.Note(
-            frequency=420,
-            waveform=SAW,
+            frequency=500,
+            waveform=SQUARE,
             amplitude=synthio.LFO(
-                waveform=CLICKS, rate=40, scale=CHIME_LEVEL, interpolate=False
+                waveform=CROAK, rate=30, scale=1, interpolate=False
             ),
-            bend=synthio.LFO(waveform=RAMP_UP, rate=1 / 0.18, scale=0.4, once=True),
+            bend=synthio.LFO(waveform=RAMP_UP, rate=1 / 0.3, scale=0.5, once=True),
             envelope=synthio.Envelope(
-                attack_time=0.01, decay_time=0.18, sustain_level=0, release_time=0.05
+                attack_time=0.01, decay_time=0.1, sustain_level=0.9, release_time=0.05
             ),
         )
 

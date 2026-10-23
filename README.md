@@ -75,7 +75,7 @@ effects below run at the same time.
   - doorbell "ding-dong" (E5, C5)
   - cartoon "boing" (a wobbling 392 Hz tone that settles over 1 s)
   - laser "pew pew pew" (three square-wave zaps falling 1800 to 450 Hz)
-  - frog "ribbit" (two raspy 420 Hz croaks, rising a little)
+  - frog "ribbit" (two raspy 500 Hz croaks, rising half an octave)
   - flying saucer (a warbling tone climbing 500 to 1400 Hz, then fading)
 - The angle comes from the accelerometer's gravity reading compared with
   `CLOSED_GRAVITY`, gravity as the board sees it with the door closed (from the
