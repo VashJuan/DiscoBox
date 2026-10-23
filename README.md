@@ -183,6 +183,14 @@ Ideas for new effects, and what has been tried, are in [IDEAS.md](IDEAS.md).
   scripts, `arpy_mode/`, README, editor files): the board has only 7 MB, so
   keep it free of cruft.
 
+- **Repo and board together:** open `DiscoBox.code-workspace` in VS Code to
+  see this repo and the board's `CIRCUITPY` drive side by side. Edit in the
+  repo, then copy changed files to the board; edits made only on the board are
+  lost the next time you copy. The workspace expects the board at `I:`. To keep
+  it there, plug in the board, open Disk Management, right-click `CIRCUITPY`,
+  choose "Change Drive Letter and Paths…" and pick `I:`. Windows remembers it
+  for that board.
+
 - Check the settings in `config.py` (see [Settings](#settings-configpy) above).
   Leave `production = True` for the mailbox.
 

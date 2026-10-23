@@ -1,32 +1,23 @@
 {
+	// Edit in the repo, then copy changed files to the board.
+	// The board must keep drive letter I: (see README, "Repo and board together").
 	"folders": [
 		{
+			"name": "DiscoBox repo",
 			"path": "."
 		},
 		{
-			"path": "H:/.fseventsd"
-		},
-		{
-			"path": "H:/archived"
-		},
-		{
-			"path": "H:/docs"
-		},
-		{
-			"path": "H:/lib"
-		},
-		{
-			"path": "H:/non-dist-imgs"
-		},
-		{
-			"path": "H:/sample code"
-		},
-		{
-			"path": "H:/sounds"
-		},
-		{
-			"path": "H:/System Volume Information"
+			"name": "CIRCUITPY board (I:)",
+			"path": "I:/"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.exclude": {
+			"**/System Volume Information": true,
+			"**/.fseventsd": true,
+			"**/.Trashes": true,
+			"**/.metadata_never_index": true,
+			"**/__pycache__": true
+		}
+	}
 }
