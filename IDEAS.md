@@ -48,10 +48,12 @@ the pile. Ideas for in/out with that layout, to test:
 
 | Idea | How | Status |
 | --- | --- | --- |
-| Cartoon creak | Pitch, rasp & volume follow how fast the door swings (`creak.py`, `door_creak` in `config.py`) | built 2026-10-22; bench test: too low & quiet for the transducer, sounds like static. Replacing (below) |
+| Cartoon creak | Pitch, rasp & volume follow how fast the door swings | built 2026-10-22; too low & quiet for the transducer, sounds like static. Replaced by the squeak (below) |
+| Angle squeak | High raspy squeak while the door moves; pitch follows the door angle (rises going up, falls coming down) (`creak.py`) | built 2026-10-23; tune on the real mailbox |
+| Idle chimes | Doorbell or boing every 15-25 s while the door is still (`creak.py`) | built 2026-10-23 |
 | Volume knob | Wider open = louder song (`voice[0].level`) | idea |
 | Light control | Angle sets NeoPixel color, brightness or animation speed | idea |
-| Creak on closing | The board stays powered until the door shuts, so the closing swing creaks too | comes with the creak |
+| Squeak on closing | The board stays powered until the door shuts, so the closing swing squeaks too | comes with the squeak |
 | Grand entrance | Rising "ta-daaa" sweep as the door opens | idea |
 | Door as instrument | Angle sets synth pitch or filter, so swinging the door plays notes | idea |
 
@@ -65,15 +67,16 @@ plays these over a ducked song:
 
 | Sound | How | Status |
 | --- | --- | --- |
-| Squeak | Raspy saw, 700 Hz rising most of an octave in 0.7 s: a high hinge "eeek" | in test 2026-10-22 |
-| Doorbell | "Ding-dong", E5 then C5, bell tone with harmonics, 1.2 s ring | in test 2026-10-22 |
-| Boing | 392 Hz triangle with a 14 Hz wobble that settles over 1 s | in test 2026-10-22 |
-| Ta-da | Square-wave C-E-G arpeggio, then a held high C | in test 2026-10-22 |
-| Cuckoo | G5 to E flat 5, twice, triangle wave | in test 2026-10-22 |
+| Squeak | Raspy saw, 700 Hz rising most of an octave in 0.7 s: a high hinge "eeek" | chosen 2026-10-23 |
+| Doorbell | "Ding-dong", E5 then C5, bell tone with harmonics, 1.2 s ring | chosen 2026-10-23 (idle chime) |
+| Boing | 392 Hz triangle with a 14 Hz wobble that settles over 1 s | chosen 2026-10-23 (idle chime) |
+| Ta-da | Square-wave C-E-G arpeggio, then a held high C | tried 2026-10-23; spare |
+| Cuckoo | G5 to E flat 5, twice, triangle wave | tried 2026-10-23; spare |
 | Recorded creak WAV | A short real creak, 22 kHz mono, played on opening | idea; needs board space |
 
-The chosen sound would play once as the door starts to open (accelerometer
-swing speed over a threshold), instead of following the swing like the creak.
+Result 2026-10-23: all were fine; squeak, doorbell & boing were best. John
+chose the squeak while the door moves (pitch following the angle) and the
+doorbell or boing every ~20 s while it is still. Ta-da and cuckoo are spares.
 
 ## Lights
 

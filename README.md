@@ -55,26 +55,37 @@ effects below run at the same time.
   `mp3files` in `config.py`. Only rows with Priority up to `MAX_PRIORITY` (14)
   are cut, so 60 s clips fit the board.
 
-### Cartoon door creak (`creak.py`)
+### Door squeak & chimes (`creak.py`)
 
-- A raspy, buzzy synth tone plays over the song while the door swings, opening
-  or closing.
-- The accelerometer on the Feather sees the direction of gravity turn as the
-  door swings. The faster it turns, the higher, raspier and louder the creak:
+- **Squeak while the door swings:** a raspy, high hinge "eeek" over the song.
+  Its pitch follows the door's angle, so it rises as the door goes up and falls
+  as it comes down. The faster the swing, the louder and raspier:
 
-  | Door swing | Creak |
+  | Door | Squeak |
   | --- | --- |
-  | under 20°/s (still) | silent |
-  | 20°/s | 55 Hz, 12 clicks/s, quiet (volume 0.2) |
-  | 200°/s or faster | 140 Hz, 35 clicks/s, loud (volume 0.9) |
+  | closed (vertical) | 1250 Hz |
+  | fully open (110°, about 20° below level) | 700 Hz |
+  | swinging under 20°/s (still) | silent |
+  | swinging 20°/s | 18 clicks/s, quiet (volume 0.2) |
+  | swinging 200°/s or faster | 30 clicks/s, loud (volume 0.9) |
 
-- No calibration is needed; it works whichever way the board is mounted.
-- The tuning numbers are at the top of `creak.py`. Turn the creak off with
-  `door_creak = False` in `config.py`.
-- Status: bench-tested 2026-10-22 on the transducer: too quiet, and the
-  55-140 Hz tone sounds like static under the song (the transducer is weak
-  that low). A higher version (250-600 Hz) sounded like a voice. Replacements
-  are being tried with `test_door_sounds.py`.
+  Pitch and volume glide to each new reading over 0.15 s, so they don't step.
+  The song drops to 0.08 while the door squeaks (0.25 for the other effects).
+- **Chimes while the door is still:** a doorbell "ding-dong" (E5, C5) or a
+  cartoon "boing" (a wobbling 392 Hz tone that settles over 1 s), picked at
+  random, every 15-25 s.
+- The angle comes from the accelerometer's gravity reading compared with
+  `CLOSED_GRAVITY`, gravity as the board sees it with the door closed (from the
+  sensors.py note: y ≈ -0.9 closed). It must match how the board is mounted.
+- The tuning numbers are at the top of `creak.py` (`SQUEAK_DUCKED_LEVEL` is in
+  `sound.py`). Turn the door sounds off with `door_creak = False` in
+  `config.py`.
+- Status: built 2026-10-23 after trying five sounds with
+  `test_door_sounds.py` (all fine; squeak, doorbell & boing best). First try on
+  the bench sounded like static; the glide and deeper song duck were added.
+  Next: tune on the real mailbox (`CLOSED_GRAVITY`, pitch direction, volume).
+  The old low creak (55-140 Hz, following swing speed) sounded like static on
+  the transducer.
 
 ### Slide whistle (`whistle.py`)
 
@@ -113,7 +124,7 @@ effects below run at the same time.
 
 ### Sensors
 
-- **Accelerometer (LIS3DH, on the Feather):** drives the door creak. In debug
+- **Accelerometer (LIS3DH, on the Feather):** drives the door squeak & chimes. In debug
   mode it also prints "Tapped!" and "Shaken!".
 - **Distance sensor (VL53L1X):** measures up to about 1.3 m, about 10 times a
   second. Drives the slide whistle; in debug mode the reading is also printed.
@@ -131,7 +142,7 @@ effects below run at the same time.
 | --- | --- |
 | `production` | `True`: fast start, music first, no debug printing. `False`: play the start-up audio tests first and print debug information to the serial console. |
 | `mp3files` | The playlist, in order. |
-| `door_creak` | `True` to play the door creak. |
+| `door_creak` | `True` to play the door squeak & chimes. |
 | `slide_whistle` | `True` to play the slide whistle. |
 
 ### Code layout
@@ -141,7 +152,7 @@ effects below run at the same time.
 | `main.py` | Starts the music, sets up the hardware, then runs the main loop |
 | `config.py` | Settings |
 | `sound.py` | Speaker output, mixer, playlist & start-up audio tests |
-| `creak.py` | Door creak |
+| `creak.py` | Door squeak & chimes |
 | `whistle.py` | Slide whistle |
 | `lights.py` | NeoPixel animations |
 | `prop_servo.py` | Servo sweep |
@@ -160,8 +171,8 @@ instead of `main.py`. Each prints what it is doing to the serial console. Delete
 
 | Script | What you should hear or see |
 | --- | --- |
-| `test_creak.py` | A beep, then pretend door swings, alternating the `creak.py` creak (1 beep first) with a higher, louder version (2 beeps first) |
-| `test_door_sounds.py` | Five door sounds over a ducked song, each after 1-5 beeps: squeak, doorbell, boing, ta-da, cuckoo |
+| `test_creak.py` | The old creak (no longer in `creak.py`; may need updating): a beep, then pretend door swings |
+| `test_door_sounds.py` | Five door sounds over a ducked song, each after 1-5 beeps: squeak, doorbell, boing, ta-da, cuckoo. With a serial console open it waits for a number (1-5, Enter); otherwise it loops through all five |
 | `test_distance.py` | A beep, the I2C addresses found (VL53L1X = `0x29`), then a tone that rises as your hand gets closer |
 | `test_servo.py` | The servo moves to 0°, 90°, 180° and 90°, 2 s each, then sweeps |
 

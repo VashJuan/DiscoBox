@@ -11,7 +11,7 @@
 #   lights.py      onboard status LED & external NeoPixel animations
 #   prop_servo.py  servo sweep
 #   sound.py       I2S audio, mixer & start-up audio tests
-#   creak.py       cartoon door creak (when door_creak is True)
+#   creak.py       door squeak & chimes (when door_creak is True)
 #   whistle.py     slide whistle from the distance sensor (when slide_whistle is True)
 # The experimental arpeggiator lives apart, in arpy_mode/.
 
@@ -116,8 +116,11 @@ def tick():
 
     # Turn the song down while an effect plays
     ducker.update(
-        (creak is not None and creak.voice.level > 0)
-        or (whistle is not None and whistle.playing)
+        (creak is not None and creak.playing)
+        or (whistle is not None and whistle.playing),
+        sound.SQUEAK_DUCKED_LEVEL
+        if creak is not None and creak.squeaking
+        else sound.DUCKED_LEVEL,
     )
 
     # -----------------

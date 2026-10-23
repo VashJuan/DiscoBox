@@ -34,6 +34,7 @@ MIXER_CHANNELS = 1
 # Song volume; it ducks while the creak or whistle plays so they stand out
 SONG_LEVEL = 0.6
 DUCKED_LEVEL = 0.25
+SQUEAK_DUCKED_LEVEL = 0.08  # lower still while the door squeaks
 DUCK_DOWN = 0.1  # seconds to fade the song down when an effect starts
 DUCK_UP = 0.8  # seconds to bring it back after the effects stop
 
@@ -126,15 +127,16 @@ class SongDucker:
         self.level = SONG_LEVEL
         self.last_time = time.monotonic()
 
-    def update(self, effects_playing):
+    def update(self, effects_playing, ducked_level=DUCKED_LEVEL):
         """Call often; effects_playing is True while the creak or whistle sounds"""
         now = time.monotonic()
         elapsed, self.last_time = now - self.last_time, now
         span = SONG_LEVEL - DUCKED_LEVEL
-        if effects_playing:
-            self.level = max(self.level - span * elapsed / DUCK_DOWN, DUCKED_LEVEL)
+        target = ducked_level if effects_playing else SONG_LEVEL
+        if self.level > target:
+            self.level = max(self.level - span * elapsed / DUCK_DOWN, target)
         else:
-            self.level = min(self.level + span * elapsed / DUCK_UP, SONG_LEVEL)
+            self.level = min(self.level + span * elapsed / DUCK_UP, target)
         if self.voice.level != self.level:
             self.voice.level = self.level
 
