@@ -48,12 +48,32 @@ the pile. Ideas for in/out with that layout, to test:
 
 | Idea | How | Status |
 | --- | --- | --- |
-| Cartoon creak | Pitch, rasp & volume follow how fast the door swings (`creak.py`, `door_creak` in `config.py`) | built 2026-10-22, untested by ear |
+| Cartoon creak | Pitch, rasp & volume follow how fast the door swings (`creak.py`, `door_creak` in `config.py`) | built 2026-10-22; bench test: too low & quiet for the transducer, sounds like static. Replacing (below) |
 | Volume knob | Wider open = louder song (`voice[0].level`) | idea |
 | Light control | Angle sets NeoPixel color, brightness or animation speed | idea |
 | Creak on closing | The board stays powered until the door shuts, so the closing swing creaks too | comes with the creak |
 | Grand entrance | Rising "ta-daaa" sweep as the door opens | idea |
 | Door as instrument | Angle sets synth pitch or filter, so swinging the door plays notes | idea |
+
+### Door sounds to replace the creak
+
+Outdoors there is no room to reflect sound, and the transducer is weak below
+~300 Hz, so a door sound should be mid-to-high pitched, short, and clearly
+different from the song (ducked to 0.25) and the slide whistle (a smooth sine).
+Synthesized sounds cost no board space (1.1 MB free). `test_door_sounds.py`
+plays these over a ducked song:
+
+| Sound | How | Status |
+| --- | --- | --- |
+| Squeak | Raspy saw, 700 Hz rising most of an octave in 0.7 s: a high hinge "eeek" | in test 2026-10-22 |
+| Doorbell | "Ding-dong", E5 then C5, bell tone with harmonics, 1.2 s ring | in test 2026-10-22 |
+| Boing | 392 Hz triangle with a 14 Hz wobble that settles over 1 s | in test 2026-10-22 |
+| Ta-da | Square-wave C-E-G arpeggio, then a held high C | in test 2026-10-22 |
+| Cuckoo | G5 to E flat 5, twice, triangle wave | in test 2026-10-22 |
+| Recorded creak WAV | A short real creak, 22 kHz mono, played on opening | idea; needs board space |
+
+The chosen sound would play once as the door starts to open (accelerometer
+swing speed over a threshold), instead of following the swing like the creak.
 
 ## Lights
 
@@ -61,6 +81,11 @@ The lights face the front from the back of the box, so most people see the
 glow, not the pattern, unless they crouch and look in. Favour effects that read
 as **shifting color and brightness**: slow color washes, brightness pulses on
 events (mail, door swing), a color per song.
+
+| Idea | How | Status |
+| --- | --- | --- |
+| Lights follow the music | `audiomp3.MP3Decoder` has an `rms_level` property (the loudness of the audio it is decoding). Read it each loop and map it to the panel's brightness (e.g. 0.02-0.3), smoothed so it pulses with the beat instead of flickering. A few lines in `main.py`; no extra hardware | idea 2026-10-22; easy |
+| Beat flash | Same `rms_level`; flash white or change animation when it jumps well above its recent average | idea |
 
 ## Controls
 

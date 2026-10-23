@@ -32,7 +32,18 @@ effects below run at the same time.
 - The playlist (`mp3files` in `config.py`, files in `/sounds/`):
 
   25 clips, 60 s each with a fade out, in priority order from
-  `sounds_workshop/songs.xlsx` (about 5.9 MB at 32 kbps).
+  `sounds_workshop/songs.xlsx` (every song with Priority 14 or better).
+- How the clips are made (`sounds_workshop/make_clips.py`, on the PC):
+  - 22050 Hz mono MP3 at **32 kbps**: 60 s is about 235 KB, so all 25 fit in
+    about 5.9 MB of the board's 7.1 MB. At 48 kbps only 16 fitted.
+  - 0.5 s fade in, 3 s fade out.
+  - **Loudness-matched** so no song is much louder than the next. The source
+    songs ranged from -25 LUFS (YMCA) to -7 LUFS (Axel F), a 19 dB spread; the
+    clips now sit between -10 and -13 LUFS. The script mixes to mono at 22 kHz,
+    measures, applies ffmpeg's two-pass `loudnorm` (target -12 LUFS, a little
+    louder than streaming's -14, for outdoors; peaks under -2 dBTP), then
+    measures the finished clip and cuts it again with a gain correction and a
+    limiter if it is more than 1 dB off.
 
 - Songs are 22050 Hz mono MP3s so they go through the audio mixer (song volume
   0.6), which lets effects such as the door creak play over them. A song in any
@@ -60,12 +71,15 @@ effects below run at the same time.
 - No calibration is needed; it works whichever way the board is mounted.
 - The tuning numbers are at the top of `creak.py`. Turn the creak off with
   `door_creak = False` in `config.py`.
-- Status: built, not yet tuned by ear on the real door.
+- Status: bench-tested 2026-10-22 on the transducer: too quiet, and the
+  55-140 Hz tone sounds like static under the song (the transducer is weak
+  that low). A higher version (250-600 Hz) sounded like a voice. Replacements
+  are being tried with `test_door_sounds.py`.
 
 ### Slide whistle (`whistle.py`)
 
 - When a hand or mail moves through the distance sensor's beam, a whistle
-  plays over the song, gliding with the distance: about 1800 Hz at 3 cm, 500 Hz
+  plays over the song, gliding with the distance: about 2500 Hz at 3 cm, 700 Hz
   at 130 cm.
 - It starts when a reading changes by 3 cm or more, and fades out 0.4 s after
   readings stop changing, or as soon as nothing is in range.
@@ -73,7 +87,9 @@ effects below run at the same time.
   idea (see [IDEAS.md](IDEAS.md)).
 - The tuning numbers are at the top of `whistle.py`. Turn the whistle off with
   `slide_whistle = False` in `config.py`.
-- Status: built, not yet tried on the board.
+- Status: tried on the board 2026-10-22: "not like a whistle, but
+  reasonable". Raised from 1800-500 Hz to 2500-700 Hz to sound a bit higher.
+  A little vibrato might make it more whistle-like (idea).
 
 ### Lights (`lights.py`)
 
@@ -145,6 +161,7 @@ instead of `main.py`. Each prints what it is doing to the serial console. Delete
 | Script | What you should hear or see |
 | --- | --- |
 | `test_creak.py` | A beep, then pretend door swings, alternating the `creak.py` creak (1 beep first) with a higher, louder version (2 beeps first) |
+| `test_door_sounds.py` | Five door sounds over a ducked song, each after 1-5 beeps: squeak, doorbell, boing, ta-da, cuckoo |
 | `test_distance.py` | A beep, the I2C addresses found (VL53L1X = `0x29`), then a tone that rises as your hand gets closer |
 | `test_servo.py` | The servo moves to 0°, 90°, 180° and 90°, 2 s each, then sweeps |
 

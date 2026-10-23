@@ -19,6 +19,8 @@
     the board is still. Undecided: tune further or pick another sound (Q4).
 - **Q4** (2026-10-22): Keep working on the creak, or replace it with a
   different door sound (e.g. a recorded creak WAV, a slide whistle, a "boing")?
+  - ✅ 2026-10-22: try other sounds that suit the transducer, the songs and
+    being outdoors. Five built in test_door_sounds.py (see Q7).
 - **Q5** (2026-10-22): How does the slide whistle (whistle.py) sound when a
   hand or mail passes through the beam? Too loud or quiet, too high or low,
   does it play when nothing moves, and does the song crackle now that three
@@ -27,3 +29,7 @@
     raised from 1800-500 Hz to 2500-700 Hz.
 - **Q6** (2026-10-22): Is the higher whistle (2500-700 Hz) better? Want it
   more whistle-like (a little wobble/vibrato, like a real slide whistle)?
+- **Q7** (2026-10-22): Run test_door_sounds.py (copy to the board as code.py)
+  outdoors. Which of the five works best over the song: 1 squeak, 2 doorbell,
+  3 boing, 4 ta-da, 5 cuckoo? Any too loud, quiet, harsh or long? The winner
+  will play once each time the door opens.
