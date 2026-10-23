@@ -71,9 +71,12 @@ effects below run at the same time.
 
   Pitch and volume glide to each new reading over 0.15 s, so they don't step.
   The song drops to 0.08 while the door squeaks (0.25 for the other effects).
-- **Chimes while the door is still:** a doorbell "ding-dong" (E5, C5) or a
-  cartoon "boing" (a wobbling 392 Hz tone that settles over 1 s), picked at
-  random, every 30-50 s.
+- **Chimes while the door is still:** one picked at random every 30-50 s:
+  - doorbell "ding-dong" (E5, C5)
+  - cartoon "boing" (a wobbling 392 Hz tone that settles over 1 s)
+  - laser "pew pew pew" (three square-wave zaps falling 1800 to 450 Hz)
+  - frog "ribbit" (two raspy 420 Hz croaks, rising a little)
+  - flying saucer (a warbling tone climbing 500 to 1400 Hz, then fading)
 - The angle comes from the accelerometer's gravity reading compared with
   `CLOSED_GRAVITY`, gravity as the board sees it with the door closed (from the
   sensors.py note: y ≈ -0.9 closed). It must match how the board is mounted.
@@ -182,7 +185,7 @@ instead of `main.py`. Each prints what it is doing to the serial console. Delete
 | Script | What you should hear or see |
 | --- | --- |
 | `test_creak.py` | The old creak (no longer in `creak.py`; may need updating): a beep, then pretend door swings |
-| `test_door_sounds.py` | Five door sounds over a ducked song, each after 1-5 beeps: squeak, doorbell, boing, ta-da, cuckoo. With a serial console open it waits for a number (1-5, Enter); otherwise it loops through all five |
+| `test_door_sounds.py` | Eight door sounds over a ducked song, each after 1-8 beeps: squeak, doorbell, boing, ta-da, cuckoo, laser, frog, saucer. With a serial console open it waits for a number (1-8, Enter); otherwise it loops through all eight |
 | `test_distance.py` | A beep, the I2C addresses found (VL53L1X = `0x29`), then a tone that rises as your hand gets closer |
 | `test_lights.py` | Every panel animation, 8 s each, name on the serial console |
 | `test_servo.py` | The servo moves to 0°, 90°, 180° and 90°, 2 s each, then sweeps |

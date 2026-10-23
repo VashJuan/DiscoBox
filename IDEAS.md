@@ -50,7 +50,7 @@ the pile. Ideas for in/out with that layout, to test:
 | --- | --- | --- |
 | Cartoon creak | Pitch, rasp & volume follow how fast the door swings | built 2026-10-22; too low & quiet for the transducer, sounds like static. Replaced by the squeak (below) |
 | Angle squeak | High raspy squeak while the door moves; pitch follows the door angle (rises going up, falls coming down) (`creak.py`) | built 2026-10-23; tune on the real mailbox |
-| Idle chimes | Doorbell or boing every 30-50 s while the door is still (`creak.py`) | built 2026-10-23 |
+| Idle chimes | Doorbell, boing, laser, frog or saucer every 30-50 s while the door is still (`creak.py`) | built 2026-10-23 |
 | Volume knob | Wider open = louder song (`voice[0].level`) | idea |
 | Light control | Angle sets NeoPixel color, brightness or animation speed | idea |
 | Squeak on closing | The board stays powered until the door shuts, so the closing swing squeaks too | comes with the squeak |
@@ -72,6 +72,9 @@ plays these over a ducked song:
 | Boing | 392 Hz triangle with a 14 Hz wobble that settles over 1 s | chosen 2026-10-23 (idle chime) |
 | Ta-da | Square-wave C-E-G arpeggio, then a held high C | tried 2026-10-23; spare |
 | Cuckoo | G5 to E flat 5, twice, triangle wave | tried 2026-10-23; spare |
+| Laser | "Pew pew pew": three square-wave zaps, each falling 1800 to 450 Hz in 0.15 s | added 2026-10-23 (idle chime); untested |
+| Frog | "Ribbit": two raspy 420 Hz saw croaks rising a little | added 2026-10-23 (idle chime); untested |
+| Flying saucer | 500 Hz triangle with an 8 Hz warble, climbing 1.5 octaves over 1.5 s, then fading | added 2026-10-23 (idle chime); untested |
 | Recorded creak WAV | A short real creak, 22 kHz mono, played on opening | idea; needs board space |
 
 Result 2026-10-23: all were fine; squeak, doorbell & boing were best. John
