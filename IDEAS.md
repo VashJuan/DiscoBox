@@ -87,8 +87,9 @@ events (mail, door swing), a color per song.
 
 | Idea | How | Status |
 | --- | --- | --- |
-| Lights follow the music | `audiomp3.MP3Decoder` has an `rms_level` property (the loudness of the audio it is decoding). Read it each loop and map it to the panel's brightness (e.g. 0.02-0.3), smoothed so it pulses with the beat instead of flickering. Built as `lights.MusicPulse` | built 2026-10-23; tune on the real mailbox |
+| Lights follow the music | `audiomp3.MP3Decoder` has an `rms_level` property (the loudness of the audio it is decoding). Read it each loop and map it to the panel's brightness (e.g. 0.02-0.3), smoothed so it pulses with the beat instead of flickering. Built as `lights.MusicPulse` | kept 2026-10-23; John: "the beat looks good for now" |
 | Beat flash | Same `rms_level`; flash white or change animation when it jumps well above its recent average | idea |
+| Bass-beat lights | Follow the kick drum and bass, not overall loudness. The board can't do it live: Python only gets `rms_level`, never the decoded samples, and filtering ~22,000 samples/s in Python is far too slow. Instead, find each clip's bass beats on the PC (low-pass the audio, detect onsets, e.g. with librosa) in the same script that cuts the clips, and save the beat times in a small file per song (a few hundred numbers). The board loads it when the song starts and flashes, or changes colour, at each time; almost no work while playing. Cost: one more step whenever clips are added or recut | idea 2026-10-23; only if the loudness pulse looks mushy |
 
 ## Controls
 
