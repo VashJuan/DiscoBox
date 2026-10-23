@@ -31,6 +31,12 @@ mp3_file2 = (
 MIXER_SAMPLE_RATE = 22050
 MIXER_CHANNELS = 1
 
+# Song volume; it ducks while the creak or whistle plays so they stand out
+SONG_LEVEL = 0.6
+DUCKED_LEVEL = 0.25
+DUCK_DOWN = 0.1  # seconds to fade the song down when an effect starts
+DUCK_UP = 0.8  # seconds to bring it back after the effects stop
+
 
 def setup_audio(test_clips=True):
     """Start I2S output through a mixer; returns (audio, mixer)"""
@@ -50,7 +56,7 @@ def setup_audio(test_clips=True):
         samples_signed=True,
     )
     audio.play(mixer)  # attach mixer to audio playback
-    mixer.voice[0].level = 0.6
+    mixer.voice[0].level = SONG_LEVEL
     if not test_clips:
         return audio, mixer
 
@@ -110,6 +116,27 @@ def play_song(audio, mixer, decoder, filename):
         return mixer.voice[0]
     audio.play(decoder)
     return audio
+
+
+class SongDucker:
+    """Fades the song (voice 0) down while effects play, and back up after"""
+
+    def __init__(self, mixer):
+        self.voice = mixer.voice[0]
+        self.level = SONG_LEVEL
+        self.last_time = time.monotonic()
+
+    def update(self, effects_playing):
+        """Call often; effects_playing is True while the creak or whistle sounds"""
+        now = time.monotonic()
+        elapsed, self.last_time = now - self.last_time, now
+        span = SONG_LEVEL - DUCKED_LEVEL
+        if effects_playing:
+            self.level = max(self.level - span * elapsed / DUCK_DOWN, DUCKED_LEVEL)
+        else:
+            self.level = min(self.level + span * elapsed / DUCK_UP, SONG_LEVEL)
+        if self.voice.level != self.level:
+            self.voice.level = self.level
 
 
 def make_sine_wave_sample(frequency=440, volume=0.1):

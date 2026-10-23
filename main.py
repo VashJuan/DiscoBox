@@ -75,6 +75,8 @@ if slide_whistle:
 
     whistle = SlideWhistle(mixer)
 
+ducker = sound.SongDucker(mixer)
+
 # ################################################
 loop_inner = 0
 
@@ -111,6 +113,12 @@ def tick():
     if creak:
         creak.update(x, y, z)
     # endregion
+
+    # Turn the song down while an effect plays
+    ducker.update(
+        (creak is not None and creak.voice.level > 0)
+        or (whistle is not None and whistle.playing)
+    )
 
     # -----------------
     # Next step of the external neopixel animation
