@@ -73,7 +73,7 @@ effects below run at the same time.
   The song drops to 0.08 while the door squeaks (0.25 for the other effects).
 - **Chimes while the door is still:** a doorbell "ding-dong" (E5, C5) or a
   cartoon "boing" (a wobbling 392 Hz tone that settles over 1 s), picked at
-  random, every 15-25 s.
+  random, every 30-50 s.
 - The angle comes from the accelerometer's gravity reading compared with
   `CLOSED_GRAVITY`, gravity as the board sees it with the door closed (from the
   sensors.py note: y ≈ -0.9 closed). It must match how the board is mounted.

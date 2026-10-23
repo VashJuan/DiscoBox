@@ -50,7 +50,7 @@ the pile. Ideas for in/out with that layout, to test:
 | --- | --- | --- |
 | Cartoon creak | Pitch, rasp & volume follow how fast the door swings | built 2026-10-22; too low & quiet for the transducer, sounds like static. Replaced by the squeak (below) |
 | Angle squeak | High raspy squeak while the door moves; pitch follows the door angle (rises going up, falls coming down) (`creak.py`) | built 2026-10-23; tune on the real mailbox |
-| Idle chimes | Doorbell or boing every 15-25 s while the door is still (`creak.py`) | built 2026-10-23 |
+| Idle chimes | Doorbell or boing every 30-50 s while the door is still (`creak.py`) | built 2026-10-23 |
 | Volume knob | Wider open = louder song (`voice[0].level`) | idea |
 | Light control | Angle sets NeoPixel color, brightness or animation speed | idea |
 | Squeak on closing | The board stays powered until the door shuts, so the closing swing squeaks too | comes with the squeak |
@@ -76,7 +76,7 @@ plays these over a ducked song:
 
 Result 2026-10-23: all were fine; squeak, doorbell & boing were best. John
 chose the squeak while the door moves (pitch following the angle) and the
-doorbell or boing every ~20 s while it is still. Ta-da and cuckoo are spares.
+doorbell or boing every ~40 s while it is still. Ta-da and cuckoo are spares.
 
 ## Lights
 

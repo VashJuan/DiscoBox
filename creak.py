@@ -9,7 +9,7 @@ gravity turn as the door swings.
   when closed (up) and low when open (down), so it rises as the door goes up and
   falls as it comes down. The faster the swing, the louder and raspier.
 - Chimes: while the door stays still, a doorbell "ding-dong" or a cartoon
-  "boing" every 15-25 seconds.
+  "boing" every 30-50 seconds.
 """
 
 import array
@@ -40,7 +40,7 @@ LEVEL = (0.2, 0.9)  # volume, slow .. fast swing
 GLIDE = 0.15  # seconds for pitch & volume to settle on a new reading
 
 # Chimes while the door is still
-CHIME_GAP = (15, 25)  # seconds of stillness before each chime
+CHIME_GAP = (30, 50)  # seconds of stillness before each chime
 CHIME_LEVEL = 0.8
 
 

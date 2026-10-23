@@ -35,7 +35,7 @@
   will play once each time the door opens.
   - ✅ 2026-10-23: all fine; 1-3 best. Squeak while the door moves, pitch
     following the angle (rising going up, falling coming down); doorbell or
-    boing every ~20 s while still. Built in creak.py.
+    boing every ~40 s while still. Built in creak.py.
 - **Q8** (2026-10-23): On the real mailbox (door vertical closed, ~110° open,
   ~20° below level): does the squeak rise going up and fall coming down? Still
   static-y? Song quiet enough under it (0.08)? Chimes too often, loud or long?
