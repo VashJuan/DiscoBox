@@ -43,8 +43,10 @@ effects below run at the same time.
 - Songs are 22050 Hz mono MP3s so they go through the audio mixer (song volume
   0.6), which lets effects such as the door creak play over them. A song in any
   other format still plays, but straight to the speaker, with no volume control
-  and no effects over it. The full-length originals are in the separate
-  `DiscoBox_References\sounds` folder.
+  and no effects over it.
+- New clips: put the full-length song in `sounds_workshop/`, add its start
+  time (seconds) to `tools/songs.csv`, run `python tools/make_clips.py`, then
+  add the new `_22k.mp3` to `mp3files` in `config.py`.
 
 ### Cartoon door creak (`creak.py`)
 
@@ -134,6 +136,9 @@ effects below run at the same time.
 | `sensors.py` | Distance sensor & accelerometer |
 | `arpy_mode/` | Arpeggiator, experimental; not part of the show |
 | `test_creak.py`, `test_distance.py`, `test_servo.py` | Test one part on its own (see below) |
+| `tools/` | PC-only: `make_clips.py` cuts board clips from `songs.csv` start times |
+| `sounds_workshop/` | Full-length song sources (local only, not in git or on the board) |
+| `references/` | Datasheets, guides & sample code (local only, not in git) |
 
 ### Testing one part at a time
 
@@ -243,7 +248,7 @@ before copying `/lib/` over. (Earlier code was tested with 9.2.1.)
 `adafruit_led_animation`, `neopixel` and `adafruit_pixelbuf`, `adafruit_motor`,
 `adafruit_lis3dh`, `adafruit_vl53l1x` and `adafruit_bus_device`. Unused ones
 (debouncer, ticks, ht16k33, midi, seesaw, wave, simpleio) were moved to
-`DiscoBox_References\Removed from board 2026-10-22\lib`. Add `adafruit_seesaw`
+`references/Removed from board 2026-10-22/lib`. Add `adafruit_seesaw`
 back if you add the rotary encoder (see [IDEAS.md](IDEAS.md#controls)).
 
 To refresh the libraries, run [circup](https://github.com/adafruit/circup)

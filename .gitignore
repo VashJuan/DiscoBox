@@ -12,6 +12,10 @@
 # Old code
 /archived
 
+# Local only: full-length song sources & reference docs
+/sounds_workshop/
+/references/
+
 #Test and non-project stuff
 junk*
 

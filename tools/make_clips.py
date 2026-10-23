@@ -15,8 +15,8 @@ import os
 import subprocess
 import sys
 
-SOURCE_DIR = r"D:\Muzak\JohnsMusic"
 HERE = os.path.dirname(os.path.abspath(__file__))
+SOURCE_DIR = os.path.join(HERE, "..", "sounds_workshop")  # full-length songs, not in git
 SOUNDS_DIR = os.path.join(HERE, "..", "sounds")
 SONGS_CSV = os.path.join(HERE, "songs.csv")
 

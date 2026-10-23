@@ -10,7 +10,7 @@ production = True
 verbose = not production  # print debug information to serial port
 
 sound_dir = "sounds/"
-# 22050 Hz mono copies, to match the mixer (originals in DiscoBox_References\sounds)
+# 22050 Hz mono copies, to match the mixer (originals in sounds_workshop/, cut by tools/make_clips.py)
 mp3files = [
     "ClassicalGas_22k.mp3",
     "happy_22k.mp3",
