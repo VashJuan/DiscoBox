@@ -73,7 +73,7 @@ plays these over a ducked song:
 | Ta-da | Square-wave C-E-G arpeggio, then a held high C | tried 2026-10-23; spare |
 | Cuckoo | G5 to E flat 5, twice, triangle wave | tried 2026-10-23; spare |
 | Laser | "Pew pew pew": three square-wave zaps, each falling 1800 to 450 Hz in 0.15 s | added 2026-10-23 (idle chime); John: fine |
-| Frog | "Ribbit": two raspy 500 Hz square-wave croaks, 0.35 s each, rising half an octave | added 2026-10-23; first version (420 Hz saw, 0.18 s) too quiet to notice, made louder & longer |
+| Frog | "Ribbit": two raspy 500 Hz square-wave croaks, 0.35 s each, rising half an octave | added 2026-10-23; first version (420 Hz saw, 0.18 s) too quiet to notice, made louder & longer; John: fine |
 | Flying saucer | 500 Hz triangle with an 8 Hz warble, climbing 1.5 octaves over 1.5 s, then fading | added 2026-10-23 (idle chime); John: fine |
 | Recorded creak WAV | A short real creak, 22 kHz mono, played on opening | idea; needs board space |
 
