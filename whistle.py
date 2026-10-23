@@ -21,7 +21,7 @@ from creak import map_range
 
 # Tuning
 NEAR, FAR = 3, 130  # cm; the sensor's short-range limits
-PITCH = (1800, 500)  # Hz at NEAR, FAR
+PITCH = (2500, 700)  # Hz at NEAR, FAR (was 1800, 500: John wanted it a bit higher)
 MOVE_CM = 3  # a reading this much different from the last counts as movement
 HOLD = 0.4  # seconds the whistle keeps playing after the last movement
 GLIDE = 0.15  # seconds to slide most of the way to a new pitch

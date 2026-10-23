@@ -23,3 +23,7 @@
   hand or mail passes through the beam? Too loud or quiet, too high or low,
   does it play when nothing moves, and does the song crackle now that three
   sounds share the mixer? (Tuning numbers are at the top of whistle.py.)
+  - ✅ 2026-10-22: not like a whistle, but reasonable; a bit higher. PITCH
+    raised from 1800-500 Hz to 2500-700 Hz.
+- **Q6** (2026-10-22): Is the higher whistle (2500-700 Hz) better? Want it
+  more whistle-like (a little wobble/vibrato, like a real slide whistle)?
