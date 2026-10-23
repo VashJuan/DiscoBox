@@ -43,13 +43,16 @@ num_pixels = 64
 anim_speed = 0.1
 brightness = 0.05  # panel brightness when the lights don't follow the music
 
-# Animations in the show; the rest are defined but switched off (see test_lights.py)
+# Animations in the show (all of them since 2026-10-23); drop a name to switch one off
 SHOW = (
     "rainbow",
     "rainbow comet",
     "rainbow chase columns",
     "rainbow chase pixels",
     "rainbow sparkle",
+    "purple comet rows",
+    "amber comet columns",
+    "jade chase rows",
 )
 
 # Lights follow the music (MusicPulse): brightness rises with each beat, then fades

@@ -105,22 +105,24 @@ effects below run at the same time.
 ### Lights (`lights.py`)
 
 - The external 8x8 NeoPixel panel (64 LEDs, brightness 5%) runs a sequence of
-  rainbow animations, changing every 5 seconds in random order:
+  eight animations, changing every 5 seconds in random order:
   - **Rainbow** – the whole rainbow scrolls across the columns
   - **Rainbow comet** – a rainbow streak bounces back and forth
   - **Rainbow chase (columns)** – rainbow bands march across the panel
   - **Rainbow chase (pixels)** – small rainbow groups chase along every pixel
   - **Rainbow sparkle** – random pixels sparkle over a rainbow
+  - **Purple comet** – a purple streak bounces up and down the rows
+  - **Amber comet** – an amber streak bounces across the columns
+  - **Jade chase** – jade bands march along the rows
 - **Lights follow the music:** the panel's brightness rises on each beat of the
   song and fades between beats (2% in quiet moments, up to 25% on the loudest
   beats). It reads the MP3 decoder's `rms_level` (loudness) and compares it with
   the song's recent loudest, so quiet and loud songs both pulse. Tuning numbers
   (`PULSE_...`) are at the top of `lights.py`; `music_lights = False` in
   `config.py` turns it off (the panel then stays at 5%).
-- A purple comet (rows), an amber comet (columns) and a jade chase (rows) are
-  also defined in `lights.py`, but are left out of the show. To see every
-  animation, copy `test_lights.py` to the board as `code.py`; to add one to the
-  show, add its name to `SHOW` in `lights.py`.
+- To see each animation on its own, copy `test_lights.py` to the board as
+  `code.py`; to drop one from the show, remove its name from `SHOW` in
+  `lights.py`.
 - The panel sits at the back of the box facing the door, so from outside it
   mostly reads as a shifting glow of colour.
 
@@ -182,7 +184,7 @@ instead of `main.py`. Each prints what it is doing to the serial console. Delete
 | `test_creak.py` | The old creak (no longer in `creak.py`; may need updating): a beep, then pretend door swings |
 | `test_door_sounds.py` | Five door sounds over a ducked song, each after 1-5 beeps: squeak, doorbell, boing, ta-da, cuckoo. With a serial console open it waits for a number (1-5, Enter); otherwise it loops through all five |
 | `test_distance.py` | A beep, the I2C addresses found (VL53L1X = `0x29`), then a tone that rises as your hand gets closer |
-| `test_lights.py` | Every panel animation, 8 s each, name on the serial console: the five in the show, then the purple comet, amber comet and jade chase that are switched off |
+| `test_lights.py` | Every panel animation, 8 s each, name on the serial console |
 | `test_servo.py` | The servo moves to 0°, 90°, 180° and 90°, 2 s each, then sweeps |
 
 Ideas for new effects, and what has been tried, are in [IDEAS.md](IDEAS.md).

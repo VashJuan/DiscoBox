@@ -50,3 +50,4 @@
   shows all 8 animations, 8 s each, with names on the serial console. Should
   any of the three switched-off ones (purple comet, amber comet, jade chase)
   join the show, or any of the five in the show be dropped?
+  - ✅ 2026-10-23: add them all. All 8 are now in SHOW (lights.py).

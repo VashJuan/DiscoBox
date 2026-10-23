@@ -6,10 +6,9 @@
 To run: copy this file to the board as code.py (it runs instead of main.py).
 Delete code.py from the board to go back to the normal show.
 
-Shows every animation in lights.py for SECONDS each, the five in the show and
-the three switched off (purple comet, amber comet, jade chase). The serial
-console prints each name, and whether it is in the show. To add or drop one
-from the show, edit SHOW at the top of lights.py.
+Shows every animation in lights.py for SECONDS each. The serial console prints
+each name, and whether it is in the show. To add or drop one from the show,
+edit SHOW at the top of lights.py.
 """
 
 import time
