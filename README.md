@@ -31,10 +31,8 @@ effects below run at the same time.
   start.
 - The playlist (`mp3files` in `config.py`, files in `/sounds/`):
 
-  16 clips, 60 s each with a fade out: One Day, Sexbomb, I Will Always Love
-  You, Classical Gas, Wannabe, I'm Too Sexy, Yellow Submarine, Who Let The
-  Dogs Out, Don't Worry Be Happy, Fire, YMCA, Beat It, Gangnam Style, Believe,
-  Hey Ya! and Macarena (about 5.6 MB at 48 kbps).
+  25 clips, 60 s each with a fade out, in priority order from
+  `sounds_workshop/songs.xlsx` (about 5.9 MB at 32 kbps).
 
 - Songs are 22050 Hz mono MP3s so they go through the audio mixer (song volume
   0.6), which lets effects such as the door creak play over them. A song in any
@@ -43,7 +41,7 @@ effects below run at the same time.
 - New clips: put the full-length song in `sounds_workshop/`, add a row
   (Priority, start, name, source) to `sounds_workshop/songs.xlsx`, run
   `python sounds_workshop/make_clips.py`, then paste the list it prints into
-  `mp3files` in `config.py`. Only rows with Priority up to `MAX_PRIORITY` (8)
+  `mp3files` in `config.py`. Only rows with Priority up to `MAX_PRIORITY` (14)
   are cut, so 60 s clips fit the board.
 
 ### Cartoon door creak (`creak.py`)

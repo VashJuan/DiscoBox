@@ -28,6 +28,15 @@ mp3files = [
     "Believe_22k.mp3",
     "HeyYa_22k.mp3",
     "Macarena_22k.mp3",
+    "Blue_22k.mp3",
+    "Scatterlings_22k.mp3",
+    "Happy_22k.mp3",
+    "MamboNo5_22k.mp3",
+    "Baby_22k.mp3",
+    "Tubthumping_22k.mp3",
+    "NeverGonnaGiveYouUp_22k.mp3",
+    "PokerFace_22k.mp3",
+    "AxelF_22k.mp3",
 ]
 
 door_creak = True  # cartoon creak over the song as the door swings (creak.py)
