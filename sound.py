@@ -23,7 +23,7 @@ from config import verbose, sound_dir, mp3files
 wav_file2 = "sounds/amenfull_22k_s16.wav"
 # in 'circuitpython-tricks/larger-tricks/breakbeat_wavs'
 mp3_file2 = (
-    "sounds/One_Day-22Hz-16kbpsConst.mp3"
+    "sounds/OneDay_22k.mp3"
     # in 'circuitpython-tricks/larger-tricks/wav'
 )
 # https://freesound.org/people/f-r-a-g-i-l-e/sounds/476663/
