@@ -31,11 +31,11 @@ effects below run at the same time.
   start.
 - The playlist (`mp3files` in `config.py`, files in `/sounds/`):
 
-  25 clips, 60 s each with a fade out, in priority order from
+  28 clips, 60 s each with a fade out, in priority order from
   `sounds_workshop/songs.xlsx` (every song with Priority 14 or better).
 - How the clips are made (`sounds_workshop/make_clips.py`, on the PC):
-  - 22050 Hz mono MP3 at **32 kbps**: 60 s is about 235 KB, so all 25 fit in
-    about 5.9 MB of the board's 7.1 MB. At 48 kbps only 16 fitted.
+  - 22050 Hz mono MP3 at **32 kbps**: 60 s is about 235 KB, so all 28 fit in
+    about 6.6 MB of the board's 7.1 MB. At 48 kbps only 16 fitted.
   - 0.5 s fade in, 3 s fade out.
   - **Loudness-matched** so no song is much louder than the next. The source
     songs ranged from -25 LUFS (YMCA) to -7 LUFS (Axel F), a 19 dB spread; the
