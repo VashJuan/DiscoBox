@@ -87,7 +87,7 @@ events (mail, door swing), a color per song.
 
 | Idea | How | Status |
 | --- | --- | --- |
-| Lights follow the music | `audiomp3.MP3Decoder` has an `rms_level` property (the loudness of the audio it is decoding). Read it each loop and map it to the panel's brightness (e.g. 0.02-0.3), smoothed so it pulses with the beat instead of flickering. A few lines in `main.py`; no extra hardware | idea 2026-10-22; easy |
+| Lights follow the music | `audiomp3.MP3Decoder` has an `rms_level` property (the loudness of the audio it is decoding). Read it each loop and map it to the panel's brightness (e.g. 0.02-0.3), smoothed so it pulses with the beat instead of flickering. Built as `lights.MusicPulse` | built 2026-10-23; tune on the real mailbox |
 | Beat flash | Same `rms_level`; flash white or change animation when it jumps well above its recent average | idea |
 
 ## Controls

@@ -40,3 +40,11 @@
   ~20° below level): does the squeak rise going up and fall coming down? Still
   static-y? Song quiet enough under it (0.08)? Chimes too often, loud or long?
   (Tuning at the top of creak.py; CLOSED_GRAVITY may need measuring.)
+- **Q9** (2026-10-23): The panel now pulses with the music (lights.py,
+  MusicPulse). Does it visibly beat with the song, or is it too flickery, too
+  subtle, too bright or too dim? (Tuning: PULSE_MIN/MAX, PULSE_FADE, BEAT_FLOOR
+  at the top of lights.py.)
+- **Q10** (2026-10-23): Run test_lights.py (copy to the board as code.py). It
+  shows all 8 animations, 8 s each, with names on the serial console. Should
+  any of the three switched-off ones (purple comet, amber comet, jade chase)
+  join the show, or any of the five in the show be dropped?

@@ -8,7 +8,7 @@
 # Modules in this folder:
 #   config.py      settings (production, verbose, sound files, effects on/off)
 #   sensors.py     VL53L1X distance sensor & LIS3DH accelerometer
-#   lights.py      onboard status LED & external NeoPixel animations
+#   lights.py      onboard status LED, NeoPixel animations & music pulse
 #   prop_servo.py  servo sweep
 #   sound.py       I2S audio, mixer & start-up audio tests
 #   creak.py       door squeak & chimes (when door_creak is True)
@@ -20,7 +20,14 @@ import time
 import board
 from digitalio import DigitalInOut
 
-from config import verbose, production, mp3files, door_creak, slide_whistle
+from config import (
+    verbose,
+    production,
+    mp3files,
+    door_creak,
+    slide_whistle,
+    music_lights,
+)
 import sound
 
 
@@ -59,7 +66,7 @@ timing("libraries imported")
 i2c = board.STEMMA_I2C()  # Use built-in STEMMA QT connector on RP2040
 vl53 = sensors.setup_tof(i2c)
 prop_servo = ServoSweep()
-animations = lights.setup_animations()
+animations, pixels = lights.setup_animations()
 lis3dh = sensors.setup_accelerometer()
 timing("sensors, servo & lights set up")
 
@@ -76,6 +83,8 @@ if slide_whistle:
     whistle = SlideWhistle(mixer)
 
 ducker = sound.SongDucker(mixer)
+
+pulse = lights.MusicPulse(pixels, song_decoder) if music_lights else None
 
 # ################################################
 loop_inner = 0
@@ -129,6 +138,11 @@ def tick():
     # https://docs.circuitpython.org/projects/led-animation/en/latest/api.html#adafruit_led_animation.animation.Animation
     # https://learn.adafruit.com/cooperative-multitasking-in-circuitpython-with-asyncio?view=all
     animations.animate()
+    if pulse:
+        pulse.update()  # brightness follows the song's loudness
+        if verbose and not loop_inner % 25:
+            print("Loudness: {:.0f}  brightness: {:.3f}".format(
+                song_decoder.rms_level, pixels.brightness))
 
     # -----------------
     prop_servo.step()
