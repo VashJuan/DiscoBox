@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: MIT
 
 """Arpeggio synth: Arpy (broken or rolling chord: notes of a chord individually &
-quickly sounded in a progressive rising or descending order)"""
+quickly sounded in a progressive rising or descending order)
+
+Experimental, kept apart from the mailbox show. To run: copy this file to the
+board as code.py (it runs instead of main.py), and arpy.py beside it. Delete
+both from the board to go back to the normal show. See README.md here.
+"""
 
 # https://github.com/todbot/circuitpython-synthio-tricks/tree/main/
 # examples/eighties_arp based code
@@ -13,6 +18,7 @@ from random import randrange
 import board
 import audiopwmio
 import audiomixer
+import neopixel
 import synthio
 import rainbowio
 import ulab.numpy as np  # numerical approximation methods
@@ -119,3 +125,10 @@ def arp_step(arpy):
 
     arpy.update()
     time.sleep(3)
+
+
+if __name__ == "__main__":
+    status_led = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.1)
+    _audio, _mixer, arp = setup_arpy(status_led)
+    while True:
+        arp_step(arp)

@@ -62,6 +62,55 @@ glow, not the pattern, unless they crouch and look in. Favour effects that read
 as **shifting color and brightness**: slow color washes, brightness pulses on
 events (mail, door swing), a color per song.
 
+## Controls
+
+Saved from code that was switched off in `main.py` (removed 2026-10-22). Neither
+was wired up in the box.
+
+| Idea | How | Status |
+| --- | --- | --- |
+| Rotary encoder | [Adafruit ANO rotary encoder](https://www.adafruit.com/product/5740) on the STEMMA QT I2C bus: knob plus 5 buttons. Could set song volume, skip songs, pick an effect, or play the arpeggiator (`arpy_mode/`) | idea |
+| External button | The Prop-Maker's `Btn` screw terminal (`board.EXTERNAL_BUTTON`): skip song, or a secret "party mode" | idea |
+
+Rotary encoder setup (needs `adafruit_seesaw` back in `/lib/`; `i2c` is the
+`board.STEMMA_I2C()` bus already in `main.py`):
+
+```python
+from adafruit_seesaw import seesaw, rotaryio, digitalio
+
+ss = seesaw.Seesaw(i2c, addr=0x49)
+if (ss.get_version() >> 16) & 0xFFFF != 5740:
+    print("Wrong firmware loaded?  Expected 5740")
+for i in range(1, 6):
+    ss.pin_mode(i, ss.INPUT_PULLUP)
+buttons = [digitalio.DigitalIO(ss, i) for i in range(1, 6)]
+button_names = ["Select", "Up", "Left", "Down", "Right"]
+button_states = [False] * 5
+encoder = rotaryio.IncrementalEncoder(ss)
+last_position = None
+
+# in tick():
+position = encoder.position
+if position != last_position:
+    last_position = position
+    print("Position:", position)
+for b in range(5):
+    pressed = not buttons[b].value
+    if pressed != button_states[b]:
+        button_states[b] = pressed
+        print(button_names[b], "pressed" if pressed else "released")
+```
+
+External button setup:
+
+```python
+from digitalio import DigitalInOut, Direction, Pull
+
+button = DigitalInOut(board.EXTERNAL_BUTTON)
+button.direction = Direction.INPUT
+button.pull = Pull.UP  # reads False while pressed
+```
+
 ## Ways to vary it over time
 
 - A `config.py` setting per effect, so each can be turned on and off.

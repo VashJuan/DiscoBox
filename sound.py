@@ -38,8 +38,6 @@ def setup_audio(test_clips=True):
     audio = audiobusio.I2SOut(
         board.I2S_BIT_CLOCK, board.I2S_WORD_SELECT, board.I2S_DATA
     )  # aka DAC!
-    # audio = audioio.AudioOut(board.RX) # Used on boards without I2S audio
-    # dac = audioio.AudioOut(board.SPEAKER)
 
     # Using mixer just to enable volume control
     # voice 0: songs, voice 1: door creak, voice 2: slide whistle
@@ -47,12 +45,10 @@ def setup_audio(test_clips=True):
     mixer = audiomixer.Mixer(
         voice_count=3,
         channel_count=MIXER_CHANNELS,
-        sample_rate=MIXER_SAMPLE_RATE,  # 8000,
-        #    buffer_size=2048,
+        sample_rate=MIXER_SAMPLE_RATE,
         bits_per_sample=16,
-        samples_signed=True,  # False,
+        samples_signed=True,
     )
-    # mixer = audiomixer.Mixer(channel_count=2, sample_rate=22050, buffer_size=2048)
     audio.play(mixer)  # attach mixer to audio playback
     mixer.voice[0].level = 0.6
     if not test_clips:
@@ -128,12 +124,6 @@ def make_sine_wave_sample(frequency=440, volume=0.1):
 
 def play_test_sounds(audio, mixer):
     """Load and try out each kind of audio source"""
-    for f in (262, 294, 330, 349, 392, 440, 494, 523):
-        if verbose:
-            print("play ", f, " MHz tone...")
-        # simpleio.tone(board.SPEAKER, f, 0.25)
-        time.sleep(0.5)
-
     # ######## Get MP3 file
     # https://github.com/todbot/circuitpython-tricks#playing-mp3-files
     # You have to specify some mp3 file when creating the decoder
@@ -174,15 +164,7 @@ def play_test_sounds(audio, mixer):
             pass
         print("play midi melody DONE")
 
-    # #### Get Midi file
-    # https://bitmidi.com/, https://midisfree.com,
-    # https://musiclab.chromeexperiments.com/Song-Maker/,
-    # data = open(sound_dir + "lonely.mid", "rb")
-    # midi = synthio.from_file(data)
-    # audio.play(midi)  # mixer needs samples_signed=True
-
     # ####### Create Synth
-    # synth = synthio.Synthesizer(channel_count=1, sample_rate=22050)
     synth = synthio.Synthesizer(channel_count=1, sample_rate=9990)
     if verbose:
         bps = "undefined"  # synth.bits_per_sample
@@ -197,7 +179,6 @@ def play_test_sounds(audio, mixer):
         print("sine_wave_sample sample bps:", bps, " sample rate:", sr)
 
     # ######### Play some of the above...
-    # mixer.voice[0].play(synth)  # requires mixer samples_signed=True
     print("sine_wavesample rate: ", sine_wave_sample.sample_rate)  # 22050
     audio.play(mixer)  # reattach the mixer; the melody played straight to I2S
     mixer.voice[1].play(sine_wave_sample, loop=True)

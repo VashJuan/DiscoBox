@@ -20,7 +20,5 @@ mp3files = [
     "OneDay_22k.mp3",
 ]
 
-play_arpy = False  # use the Arpy arpeggiator instead of the audio tests
-
 door_creak = True  # cartoon creak over the song as the door swings (creak.py)
 slide_whistle = True  # tone that follows the distance sensor as mail moves (whistle.py)

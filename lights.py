@@ -81,8 +81,6 @@ def setup_animations():
         pixel_wing_vertical, speed=anim_speed, tail_length=7, bounce=True
     )
     rainbow_v = Rainbow(pixel_wing_vertical, speed=anim_speed, period=2)
-    # rainbow_chase_h = RainbowChase(pixel_wing_horizontal, speed=anim_speed, size=3,
-    # spacing=3)
     rainbow_chase_h = RainbowChase(pixels, speed=anim_speed, size=3, spacing=3)
     rainbow_sparkle = RainbowSparkle(pixels, speed=anim_speed, num_sparkles=10)
 

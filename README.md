@@ -106,11 +106,10 @@ effects below run at the same time.
 
 ### Arpeggiator mode (experimental)
 
-- With `play_arpy = True` in `config.py`, the songs, creak and whistle are replaced by
-  an 80s-style synth arpeggio (`arp_synth.py`, `arpy.py`) whose root note,
-  tempo and pattern change at random, and the Feather's own LED changes colour
-  with each note. This mode sends audio to the RX pin, not the speaker
-  terminals, so it is for experimenting only.
+- An 80s-style synth arpeggio, kept apart from the show in
+  [`arpy_mode/`](arpy_mode/README.md). It runs on its own, instead of the
+  mailbox show, and is for experimenting only. How to run it and its known
+  issues are in that folder's README.
 
 ### Settings (`config.py`)
 
@@ -120,7 +119,6 @@ effects below run at the same time.
 | `mp3files` | The playlist, in order. |
 | `door_creak` | `True` to play the door creak. |
 | `slide_whistle` | `True` to play the slide whistle. |
-| `play_arpy` | `True` for the arpeggiator instead of songs. |
 
 ### Code layout
 
@@ -134,7 +132,7 @@ effects below run at the same time.
 | `lights.py` | NeoPixel animations |
 | `prop_servo.py` | Servo sweep |
 | `sensors.py` | Distance sensor & accelerometer |
-| `arp_synth.py`, `arpy.py` | Arpeggiator mode |
+| `arpy_mode/` | Arpeggiator, experimental; not part of the show |
 | `test_creak.py`, `test_distance.py`, `test_servo.py` | Test one part on its own (see below) |
 
 ### Testing one part at a time
@@ -179,11 +177,11 @@ Ideas for new effects, and what has been tried, are in [IDEAS.md](IDEAS.md).
 
 - Copy the `/lib/` and `/sounds/` directories, and all the `*.py` files
   (`main.py`, `config.py`, `sensors.py`, `lights.py`, `sound.py`,
-  `prop_servo.py`, `creak.py`, `arp_synth.py` and `arpy.py`) from the same directory as you
+  `prop_servo.py`, `creak.py` and `whistle.py`) from the same directory as you
   are reading this ReadMe.md file (https://github.com/vashjuan/DiscoBox/ most
   likely) to the root directory of the PropMaker. Copy nothing else (test
-  scripts, README, editor files): the board has only 7 MB, so keep it free of
-  cruft.
+  scripts, `arpy_mode/`, README, editor files): the board has only 7 MB, so
+  keep it free of cruft.
 
 - Check the settings in `config.py` (see [Settings](#settings-configpy) above).
   Leave `production = True` for the mailbox.
@@ -238,7 +236,7 @@ before copying `/lib/` over. (Earlier code was tested with 9.2.1.)
 `adafruit_lis3dh`, `adafruit_vl53l1x` and `adafruit_bus_device`. Unused ones
 (debouncer, ticks, ht16k33, midi, seesaw, wave, simpleio) were moved to
 `DiscoBox_References\Removed from board 2026-10-22\lib`. Add `adafruit_seesaw`
-back if you turn on the rotary encoder in `main.py`.
+back if you add the rotary encoder (see [IDEAS.md](IDEAS.md#controls)).
 
 To refresh the libraries, run [circup](https://github.com/adafruit/circup)
 against this folder (it reads the version from `boot_out.txt`):
