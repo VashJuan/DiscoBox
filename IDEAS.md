@@ -149,3 +149,75 @@ button.pull = Pull.UP  # reads False while pressed
 - Rotate effects by power-up, like the songs (store the choice in `nvm`), so the
   carrier gets a different surprise each day.
 - Random choice of voice line from a small set per event.
+
+## Seasonal themes (plan 2026-10-26)
+
+A **theme** is a set of choices: songs, light colours and animations, door
+sound, idle chimes, and how the songs are processed. "Generic" (today's
+show) is one theme; Halloween, Thanksgiving, Christmas/solstice, St Patrick's
+and so on are others. All themes live together on `main`, **not on branches**:
+a fix to the squeak or the mixer then reaches every theme straight away,
+with nothing to merge each year.
+
+### Where things live
+
+| Thing | Repo (keeps every theme, every year) | Board (one theme at a time) |
+| --- | --- | --- |
+| Theme settings | `themes/<name>.py`: palette, `SHOW` list, door sound, chime list, song volume | all `themes/*.py` (a few KB) |
+| Song clips | `sounds/<name>/*.mp3` | `/sounds/` holds only the active theme's clips |
+| Playlist | `sounds/<name>/playlist.txt`, written by `make_clips.py` (no more pasting into `config.py`) | copied with the clips |
+| Song list & start times | `sounds_workshop/songs.xlsx` with a **Theme** column | not on the board |
+| Full-length sources | `sounds_workshop/` (local only, **not backed up by git**) | not on the board |
+| Which theme is on | `theme = "halloween"` in `config.py` | same |
+
+- Code shared by all themes (`creak.py`, `lights.py`) gains a few new
+  sounds and animations; a theme picks which ones to use. Nothing is
+  duplicated per theme.
+- **Space:** about 7.1 MB on the board. Code and libraries take ~0.5 MB, so
+  one theme can have up to ~27 clips of 60 s at 32 kbps (235 KB each). A
+  short season needs fewer: one song per opening, so ~8-12 clips cover a
+  couple of weeks.
+- **Git:** each theme adds 2-6 MB of clips once; re-cutting a clip adds it
+  again. Fine for years at this rate. Tag each season's version, e.g.
+  `git tag halloween-2026`, so next year starts from exactly what ran.
+
+### Switching themes
+
+`tools/deploy.ps1 -Theme halloween` (PowerShell 7, board on `I:`):
+
+1. Sets `theme` in `I:\config.py`.
+2. Mirrors `sounds\halloween\` to `I:\sounds\` (removes the old theme's
+   clips first, so they fit).
+3. Copies the code and `themes\`.
+
+The song counter in `nvm` is saved with the theme's number, so a new theme
+starts at its first song.
+
+**Automatic by date (later):** the board has no clock that survives
+power-off and no Wi-Fi, so it can't know the date. A battery-backed real-time
+clock (Adafruit DS3231 on the STEMMA QT bus, about $14) would let it pick the
+theme by date. All seasons' clips would still not fit in 7 MB; a microSD card
+breakout (SPI) would hold every theme. Until then, switch by hand.
+
+### Halloween (first, by 2026-10-31)
+
+| Part | Halloween choice |
+| --- | --- |
+| Colours | Pumpkin orange, purple, ghoulish green, a little blood red; no rainbows |
+| Animations | Orange comet, purple chase, green sparkle on purple, **candle flicker** (new: random warm flicker), **lightning** (new: white flash with each chime) |
+| Songs | Spooky or Halloween songs, e.g. Thriller, Monster Mash, Ghostbusters, Time Warp, Purple People Eater, Somebody's Watching Me, This Is Halloween, Spooky Scary Skeletons, Addams Family, Werewolves of London, Toccata & Fugue in D minor (sources needed in `sounds_workshop/`) |
+| Haunted-house sound | Cut on the PC: `make_clips.py` adds an echo/hall reverb (ffmpeg `aecho`) to the theme's clips. Costs nothing on the board |
+| Door sound | Slow haunted-door creak: the squeak lowered to ~400-700 Hz with slower clicks (8-12/s). Not below ~300 Hz, which sounded like static on the transducer |
+| Slide whistle | Theremin: the same whistle with a 5-6 Hz vibrato (also answers Q6) |
+| Chimes | Synth (no board space): ghost "wooo" (sine gliding with vibrato), wolf howl, bat chirps, organ minor-chord stab. Recorded (~45 KB/s as WAV, less as MP3): evil laugh, witch cackle |
+
+### Other themes (ideas)
+
+| Theme | Colours | Sounds & chimes |
+| --- | --- | --- |
+| Thanksgiving | Amber, gold, brown, deep red | Turkey gobble chime, harvest/folk songs |
+| Christmas | Red, green, warm white; twinkle sparkle | Sleigh bells, carols, "ho ho ho" |
+| Solstice | Deep blue, ice white, a little gold | Wind chimes, slow bell tones |
+| St Patrick's | Greens and gold | Jigs & reels; slide whistle as a tin whistle |
+| Valentine's | Pink, red, magenta; heartbeat pulse | Love songs (the generic set has some) |
+| July 4th | Red, white, blue; firework bursts | Firework whistle-and-pop chime, marches |

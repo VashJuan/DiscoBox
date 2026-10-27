@@ -51,3 +51,13 @@
   any of the three switched-off ones (purple comet, amber comet, jade chase)
   join the show, or any of the five in the show be dropped?
   - ✅ 2026-10-23: add them all. All 8 are now in SHOW (lights.py).
+- **Q11** (2026-10-26): Seasonal themes (plan in IDEAS.md): OK to keep all
+  themes on `main` (a `themes/` folder, clips in `sounds/<theme>/`) rather
+  than branches, with a deploy script that puts one theme on the board?
+- **Q12** (2026-10-26): Which Halloween songs? Download the full songs into
+  `sounds_workshop/` and add them to `songs.xlsx` (or say which and roughly
+  where in each song to start). About 8-12 is enough for this year.
+- **Q13** (2026-10-26): Haunted-house echo on the Halloween songs: yes, no,
+  or try both? Any recorded sounds wanted (evil laugh, witch cackle)?
+- **Q14** (2026-10-26): Later, buy a real-time clock (DS3231, ~$14) so the
+  box switches themes by date on its own?
