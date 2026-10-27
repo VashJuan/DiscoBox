@@ -18,14 +18,11 @@ import audiomixer
 import audiomp3
 import synthio
 
-from config import verbose, sound_dir, mp3files
+from config import verbose, sound_dir, mp3files, theme
 
 wav_file2 = "sounds/amenfull_22k_s16.wav"
 # in 'circuitpython-tricks/larger-tricks/breakbeat_wavs'
-mp3_file2 = (
-    "sounds/OneDay_22k.mp3"
-    # in 'circuitpython-tricks/larger-tricks/wav'
-)
+mp3_file2 = sound_dir + mp3files[0]
 # https://freesound.org/people/f-r-a-g-i-l-e/sounds/476663/
 
 MIXER_SAMPLE_RATE = 22050
@@ -47,10 +44,11 @@ def setup_audio(test_clips=True):
     )  # aka DAC!
 
     # Using mixer just to enable volume control
-    # voice 0: songs, voice 1: door creak, voice 2: slide whistle
+    # voice 0: songs, voice 1: door creak & chimes, voice 2: slide whistle,
+    # voice 3: recorded chimes (WAV files)
     # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather/audio-mixer-volume-control
     mixer = audiomixer.Mixer(
-        voice_count=3,
+        voice_count=4,
         channel_count=MIXER_CHANNELS,
         sample_rate=MIXER_SAMPLE_RATE,
         bits_per_sample=16,
@@ -80,7 +78,12 @@ def first_song_index():
 
     Opening the door powers the board up, so RAM can't remember the last song.
     Erased nvm reads 0xFF, which is out of range, so that starts at song 0.
+    nvm[1] holds a number for the theme, so a new theme starts at its first song.
     """
+    theme_id = sum(theme.encode()) % 255
+    if microcontroller.nvm[1] != theme_id:
+        microcontroller.nvm[1] = theme_id
+        return 0
     index = microcontroller.nvm[0]
     return index if index < len(mp3files) else 0
 

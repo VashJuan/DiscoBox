@@ -9,38 +9,29 @@ production = True
 
 verbose = not production  # print debug information to serial port
 
+import os
+
+# Seasonal theme: a file in themes/ (lights, door sound, chimes, whistle).
+# tools/deploy.ps1 sets this on the board and puts that theme's songs in sounds/
+theme = "generic"
+theme_settings = getattr(__import__("themes." + theme), theme)
+
 sound_dir = "sounds/"
-# 22050 Hz mono copies, to match the mixer (originals in sounds_workshop/, cut by sounds_workshop/make_clips.py)
-mp3files = [
-    "OneDay_22k.mp3",
-    "Sexbomb_22k.mp3",
-    "ClassicalGas_22k.mp3",
-    "Wannabe_22k.mp3",
-    "TooSexy_22k.mp3",
-    "YellowSubmarine_22k.mp3",
-    "WhoLetTheDogsOut_22k.mp3",
-    "DontWorryBeHappy_22k.mp3",
-    "YMCA_22k.mp3",
-    "BeatIt_22k.mp3",
-    "GangnamStyle_22k.mp3",
-    "Groove_22k.mp3",
-    "DrunkenSailor_22k.mp3",
-    "WishingWell_22k.mp3",
-    "HeyYa_22k.mp3",
-    "Macarena_22k.mp3",
-    "Happy_22k.mp3",
-    "IWillAlwaysLoveYou_22k.mp3",
-    "Blue_22k.mp3",
-    "Scatterlings_22k.mp3",
-    "MamboNo5_22k.mp3",
-    "Fire_22k.mp3",
-    "Believe_22k.mp3",
-    "Tubthumping_22k.mp3",
-    "NeverGonnaGiveYouUp_22k.mp3",
-    "Baby_22k.mp3",
-    "PokerFace_22k.mp3",
-    "AxelF_22k.mp3",
-]
+
+
+def read_playlist():
+    """Song file names, in order, from sounds/playlist.txt (written by
+    tools/make_clips.py); every MP3 in sounds/ if there is no playlist"""
+    try:
+        with open(sound_dir + "playlist.txt") as playlist:
+            names = [line.strip() for line in playlist]
+        return [name for name in names if name and not name.startswith("#")]
+    except OSError:
+        return sorted(name for name in os.listdir(sound_dir) if name.endswith(".mp3"))
+
+
+# 22050 Hz mono clips, to match the mixer (cut by tools/make_clips.py)
+mp3files = read_playlist()
 
 door_creak = True  # cartoon creak over the song as the door swings (creak.py)
 slide_whistle = True  # tone that follows the distance sensor as mail moves (whistle.py)

@@ -7,6 +7,7 @@ The VL53L1X sits at the back of the box facing the door, so a hand or mail
 moving through the beam changes the reading. While it changes, the whistle
 plays: high when near, low when far, gliding between readings. Once readings
 stop changing (or nothing is in range) it fades out.
+A theme can add a wobble (WHISTLE_VIBRATO), so it sounds like a theremin.
 """
 
 import array
@@ -15,7 +16,7 @@ import time
 
 import synthio
 
-from config import verbose
+from config import verbose, theme_settings
 from sound import MIXER_SAMPLE_RATE, MIXER_CHANNELS
 from creak import map_range
 
@@ -26,6 +27,8 @@ MOVE_CM = 3  # a reading this much different from the last counts as movement
 HOLD = 0.4  # seconds the whistle keeps playing after the last movement
 GLIDE = 0.15  # seconds to slide most of the way to a new pitch
 LEVEL = 0.5  # mixer volume
+VIBRATO = theme_settings.WHISTLE_VIBRATO  # octaves of wobble; 0 = none
+VIBRATO_RATE = 5.5  # wobbles per second
 
 
 class SlideWhistle:
@@ -45,6 +48,8 @@ class SlideWhistle:
         self.note = synthio.Note(
             frequency=PITCH[1], waveform=sine, envelope=envelope
         )
+        if VIBRATO:
+            self.note.bend = synthio.LFO(rate=VIBRATO_RATE, scale=VIBRATO)
         self.voice.play(self.synth)
 
         self.last_distance = None

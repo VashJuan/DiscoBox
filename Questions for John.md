@@ -54,10 +54,20 @@
 - **Q11** (2026-10-26): Seasonal themes (plan in IDEAS.md): OK to keep all
   themes on `main` (a `themes/` folder, clips in `sounds/<theme>/`) rather
   than branches, with a deploy script that puts one theme on the board?
+  - ✅ 2026-10-26: yes. Built: themes/, sounds/<theme>/, tools/deploy.ps1.
 - **Q12** (2026-10-26): Which Halloween songs? Download the full songs into
   `sounds_workshop/` and add them to `songs.xlsx` (or say which and roughly
   where in each song to start). About 8-12 is enough for this year.
+  - ✅ 2026-10-26: as proposed; John downloads tomorrow. 12 rows (blank start/source) in tools/songs.xlsx.
 - **Q13** (2026-10-26): Haunted-house echo on the Halloween songs: yes, no,
   or try both? Any recorded sounds wanted (evil laugh, witch cackle)?
+  - ✅ 2026-10-26: try both (make_clips.py --dry for without); laughs & cries: CC0 ones added.
 - **Q14** (2026-10-26): Later, buy a real-time clock (DS3231, ~$14) so the
   box switches themes by date on its own?
+  - ✅ 2026-10-26: yes, in the future. Saved in IDEAS.md.
+- **Q15** (2026-10-26): Halloween on the board. After cutting the clips
+  (`python tools/make_clips.py --theme halloween`, and `--dry` to compare):
+  echo or dry? Then `pwsh tools/deploy.ps1 -Theme halloween` and copy
+  `test_door_sounds.py` as `code.py` (sounds 9-13). Ghost, howl, bats, organ,
+  laughs, cry & scream: too loud, quiet, long or harsh? Is the slower creak
+  still static-y? Lightning flash with each chime: too bright or too much?

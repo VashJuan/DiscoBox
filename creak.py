@@ -8,9 +8,10 @@ gravity turn as the door swings.
 - Squeak: plays while the door moves. Its pitch follows the door's angle, high
   when closed (up) and low when open (down), so it rises as the door goes up and
   falls as it comes down. The faster the swing, the louder and raspier.
-- Chimes: while the door stays still, every 30-50 seconds one of: a doorbell
-  "ding-dong", a cartoon "boing", a laser "pew pew pew", a frog "ribbit" or a
-  flying saucer.
+- Chimes: while the door stays still, every 30-50 seconds one of the theme's
+  chimes (CHIMES in themes/*.py): a doorbell "ding-dong", a cartoon "boing", a
+  laser "pew pew pew", a frog "ribbit", a flying saucer; for Halloween a ghost,
+  a wolf howl, bats, a spooky organ, or a recorded WAV (evil laugh, cries).
 """
 
 import array
@@ -18,9 +19,10 @@ import math
 import random
 import time
 
+import audiocore
 import synthio
 
-from config import verbose
+from config import verbose, sound_dir, theme_settings
 from sound import MIXER_SAMPLE_RATE, MIXER_CHANNELS
 
 # Tuning: degrees per second of door swing
@@ -34,15 +36,16 @@ SMOOTHING = 0.3  # 0..1, how much each accelerometer reading moves the average
 CLOSED_GRAVITY = (0, -1, 0)
 OPEN_ANGLE = 110  # degrees from closed (vertical) to fully open (~20 deg below level)
 
-# Squeak
-PITCH = (1250, 700)  # Hz, door closed .. fully open
-RASP = (18, 30)  # clicks per second, slow .. fast swing
+# Squeak (pitch & rasp come from the theme)
+PITCH = theme_settings.SQUEAK_PITCH  # Hz, door closed .. fully open
+RASP = theme_settings.SQUEAK_RASP  # clicks per second, slow .. fast swing
 LEVEL = (0.2, 0.9)  # volume, slow .. fast swing
 GLIDE = 0.15  # seconds for pitch & volume to settle on a new reading
 
 # Chimes while the door is still
 CHIME_GAP = (30, 50)  # seconds of stillness before each chime
 CHIME_LEVEL = 0.8
+RECORDING_LEVEL = 1.0  # mixer volume of recorded (WAV) chimes
 
 
 def map_range(s, a1, a2, b1, b2):
@@ -58,6 +61,20 @@ def wave(shape):
 
 SAW = wave(lambda p: 1 - 2 * p)  # bright & buzzy
 TRIANGLE = wave(lambda p: 1 - 4 * abs(p - 0.5))
+SINE = wave(lambda p: math.sin(2 * math.pi * p))
+# a sine with a little 3rd harmonic: a hollow "oooh"
+HOLLOW = wave(
+    lambda p: (math.sin(2 * math.pi * p) + 0.3 * math.sin(6 * math.pi * p)) / 1.3
+)
+# pipe organ: a few drawbar-like harmonics
+ORGAN = wave(
+    lambda p: (
+        math.sin(2 * math.pi * p)
+        + 0.6 * math.sin(4 * math.pi * p)
+        + 0.3 * math.sin(6 * math.pi * p)
+        + 0.2 * math.sin(8 * math.pi * p)
+    ) / 2.1
+)
 SQUARE = wave(lambda p: 1 if p < 0.5 else -1)
 RAMP_UP = array.array("h", [0, 32767])  # LFO shape: 0 to 1 once
 # short pulses on the volume make a stick-slip "rasp"
@@ -241,10 +258,200 @@ class Saucer:
         return True
 
 
-class DoorCreak:
-    """Plays on mixer voice 1, over the song on voice 0"""
+def glide_through(points, elapsed):
+    """Hz at elapsed seconds along points ((seconds, Hz), ...)"""
+    for (t1, hz1), (t2, hz2) in zip(points, points[1:]):
+        if elapsed < t2:
+            # glide evenly in pitch (octaves), not in Hz
+            return hz1 * (hz2 / hz1) ** ((elapsed - t1) / (t2 - t1))
+    return points[-1][1]
 
-    def __init__(self, mixer):
+
+class Glide:
+    """One note gliding through PATH ((seconds, Hz), ...), with a wobble"""
+
+    WAVE = SINE
+    PATH = ((0, 440), (1, 440))
+    WOBBLE = (5, 0.03)  # rate (Hz) & depth (octaves)
+    ENVELOPE = (0.2, 0.4)  # attack & release, seconds
+
+    def __init__(self, synth):
+        self.synth = synth
+        self.note = synthio.Note(
+            frequency=self.PATH[0][1],
+            waveform=self.WAVE,
+            bend=synthio.LFO(rate=self.WOBBLE[0], scale=self.WOBBLE[1]),
+            amplitude=CHIME_LEVEL,
+            envelope=synthio.Envelope(
+                attack_time=self.ENVELOPE[0],
+                decay_time=0.1,
+                sustain_level=1,
+                release_time=self.ENVELOPE[1],
+            ),
+        )
+        self.start = None
+
+    def play(self):
+        self.start = time.monotonic()
+        self.note.frequency = self.PATH[0][1]
+        self.synth.press(self.note)
+
+    def update(self):
+        """Returns False once finished"""
+        elapsed = time.monotonic() - self.start
+        if elapsed >= self.PATH[-1][0]:
+            self.synth.release(self.note)  # fades over the release time
+            return False
+        self.note.frequency = glide_through(self.PATH, elapsed)
+        return True
+
+
+class Ghost(Glide):
+    """Ghost: a hollow "woooOOOooo" that swells and sinks"""
+
+    WAVE = HOLLOW
+    PATH = ((0, 450), (1.0, 700), (2.4, 380))
+    WOBBLE = (4.5, 0.04)
+    ENVELOPE = (0.5, 0.7)
+
+
+class Howl(Glide):
+    """Wolf howl: slides up, holds with a wobble, falls away"""
+
+    WAVE = TRIANGLE
+    PATH = ((0, 480), (0.5, 1000), (1.5, 950), (2.3, 650))
+    WOBBLE = (6, 0.025)
+    ENVELOPE = (0.15, 0.5)
+
+
+class Bats(Repeats):
+    """Bats: quick high chirps"""
+
+    COUNT = 6
+    EVERY = 0.09
+    TAIL = 0.2
+
+    def make_note(self):
+        return synthio.Note(
+            frequency=random.uniform(3200, 4200),
+            waveform=TRIANGLE,
+            amplitude=CHIME_LEVEL,
+            bend=synthio.LFO(waveform=RAMP_UP, rate=1 / 0.05, scale=-0.6, once=True),
+            envelope=synthio.Envelope(
+                attack_time=0.002, decay_time=0.05, sustain_level=0, release_time=0.02
+            ),
+        )
+
+
+class Organ:
+    """Spooky organ: the opening of Bach's Toccata in D minor, ending on a chord"""
+
+    # (Hz, start, seconds)
+    SCORE = (
+        (880, 0, 0.12),  # A5
+        (784, 0.12, 0.08),  # G5
+        (880, 0.2, 0.6),  # A5
+        (784, 0.9, 0.12),  # G5
+        (698, 1.02, 0.12),  # F5
+        (659, 1.14, 0.12),  # E5
+        (587, 1.26, 0.12),  # D5
+        (554, 1.38, 0.3),  # C sharp 5
+        (587, 1.7, 1.3),  # D minor chord: D5,
+        (698, 1.7, 1.3),  # F5,
+        (880, 1.7, 1.3),  # A5
+    )
+    LENGTH = 3.0  # seconds, the last notes' end
+
+    def __init__(self, synth):
+        self.synth = synth
+        envelope = synthio.Envelope(
+            attack_time=0.01, decay_time=0.1, sustain_level=0.9, release_time=0.15
+        )
+        self.notes = [
+            synthio.Note(
+                frequency=hz,
+                waveform=ORGAN,
+                envelope=envelope,
+                amplitude=CHIME_LEVEL * 0.45,  # up to 3 at once
+            )
+            for hz, _, _ in self.SCORE
+        ]
+        self.start = None
+
+    def play(self):
+        self.start = time.monotonic()
+        self.update()
+
+    def update(self):
+        """Returns False once finished"""
+        elapsed = time.monotonic() - self.start
+        for note, (_, start, length) in zip(self.notes, self.SCORE):
+            if elapsed >= start + length:
+                self.synth.release(note)
+            elif elapsed >= start and note not in self.synth.pressed:
+                self.synth.press(note)
+        return elapsed < self.LENGTH
+
+
+class Recording:
+    """A recorded chime: a WAV file played on mixer voice 3"""
+
+    def __init__(self, voice, path):
+        self.voice = voice
+        self.path = path
+        self.file = None
+
+    def play(self):
+        self.file = open(self.path, "rb")
+        self.voice.level = RECORDING_LEVEL
+        self.voice.play(audiocore.WaveFile(self.file))
+
+    def update(self):
+        """Returns False once finished"""
+        if self.voice.playing:
+            return True
+        self.file.close()
+        return False
+
+
+# Chime names for the themes' CHIMES
+CHIMES = {
+    "doorbell": Doorbell,
+    "boing": Boing,
+    "laser": Laser,
+    "frog": Frog,
+    "saucer": Saucer,
+    "ghost": Ghost,
+    "howl": Howl,
+    "bats": Bats,
+    "organ": Organ,
+}
+
+
+def make_chimes(synth, voice):
+    """The theme's chimes; WAV files missing from sounds/ are left out"""
+    chimes = []
+    for name in theme_settings.CHIMES:
+        if not name.endswith(".wav"):
+            chimes.append(CHIMES[name](synth))
+            continue
+        try:
+            open(sound_dir + name, "rb").close()
+        except OSError:
+            if verbose:
+                print("No", sound_dir + name, "- chime left out")
+            continue
+        chimes.append(Recording(voice, sound_dir + name))
+    return chimes
+
+
+class DoorCreak:
+    """Plays on mixer voice 1 (recorded chimes on voice 3), over the song on voice 0
+
+    on_chime, if given, is called as each chime starts (e.g. to flash the lights).
+    """
+
+    def __init__(self, mixer, on_chime=None):
         self.voice = mixer.voice[1]
         self.voice.level = 1
         self.synth = synthio.Synthesizer(
@@ -263,9 +470,8 @@ class DoorCreak:
         self.level = 0
         self.last_glide = time.monotonic()
 
-        self.chimes = tuple(
-            chime(self.synth) for chime in (Doorbell, Boing, Laser, Frog, Saucer)
-        )
+        self.chimes = make_chimes(self.synth, mixer.voice[3])
+        self.on_chime = on_chime
         self.chime = None  # the chime now playing
         self.still_since = time.monotonic()
         self.chime_gap = random.uniform(*CHIME_GAP)
@@ -315,9 +521,15 @@ class DoorCreak:
 
         if speed < QUIET_SPEED:
             self.level = 0
-            if self.chime is None and now - self.still_since > self.chime_gap:
+            if (
+                self.chimes
+                and self.chime is None
+                and now - self.still_since > self.chime_gap
+            ):
                 self.chime = random.choice(self.chimes)
                 self.chime.play()
+                if self.on_chime:
+                    self.on_chime()
                 self.still_since = now
                 self.chime_gap = random.uniform(*CHIME_GAP)
             return

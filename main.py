@@ -6,7 +6,8 @@
 # https://learn.adafruit.com/adafruit-rp2040-prop-maker-feather
 
 # Modules in this folder:
-#   config.py      settings (production, verbose, sound files, effects on/off)
+#   config.py      settings (production, verbose, theme, sound files, effects on/off)
+#   themes/        one file per seasonal theme (lights, door sound, chimes)
 #   sensors.py     VL53L1X distance sensor & LIS3DH accelerometer
 #   lights.py      onboard status LED, NeoPixel animations & music pulse
 #   prop_servo.py  servo sweep
@@ -27,6 +28,8 @@ from config import (
     door_creak,
     slide_whistle,
     music_lights,
+    theme,
+    theme_settings,
 )
 import sound
 
@@ -36,7 +39,7 @@ def timing(label):
     print("{:.2f} s: {}".format(time.monotonic(), label))
 
 
-timing("main.py started")
+timing("main.py started, theme " + theme)
 
 #################################################
 # provide power to the external components (speaker amp, NeoPixels, servo)
@@ -70,11 +73,13 @@ animations, pixels = lights.setup_animations()
 lis3dh = sensors.setup_accelerometer()
 timing("sensors, servo & lights set up")
 
+lightning = lights.Lightning(pixels) if theme_settings.LIGHTNING else None
+
 creak = None
 if door_creak:
     from creak import DoorCreak
 
-    creak = DoorCreak(mixer)
+    creak = DoorCreak(mixer, on_chime=lightning.start if lightning else None)
 
 whistle = None
 if slide_whistle:
@@ -137,8 +142,11 @@ def tick():
     # How to make responsive animations???
     # https://docs.circuitpython.org/projects/led-animation/en/latest/api.html#adafruit_led_animation.animation.Animation
     # https://learn.adafruit.com/cooperative-multitasking-in-circuitpython-with-asyncio?view=all
-    animations.animate()
-    if pulse:
+    # while lightning flashes, the animations & music pulse wait
+    flashing = lightning is not None and lightning.update()
+    if not flashing:
+        animations.animate()
+    if pulse and not flashing:
         pulse.update()  # brightness follows the song's loudness
         if verbose and not loop_inner % 25:
             print("Loudness: {:.0f}  brightness: {:.3f}".format(

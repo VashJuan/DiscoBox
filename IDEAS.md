@@ -152,6 +152,10 @@ button.pull = Pull.UP  # reads False while pressed
 
 ## Seasonal themes (plan 2026-10-26)
 
+**Status 2026-10-26:** built (themes/, tools/deploy.ps1, tools/make_clips.py
+--theme, Halloween lights & chimes, CC0 recordings). Waiting for the Halloween
+songs; not yet run on the board. The DS3231 clock is for later (John: yes).
+
 A **theme** is a set of choices: songs, light colours and animations, door
 sound, idle chimes, and how the songs are processed. "Generic" (today's
 show) is one theme; Halloween, Thanksgiving, Christmas/solstice, St Patrick's
@@ -209,7 +213,7 @@ breakout (SPI) would hold every theme. Until then, switch by hand.
 | Haunted-house sound | Cut on the PC: `make_clips.py` adds an echo/hall reverb (ffmpeg `aecho`) to the theme's clips. Costs nothing on the board |
 | Door sound | Slow haunted-door creak: the squeak lowered to ~400-700 Hz with slower clicks (8-12/s). Not below ~300 Hz, which sounded like static on the transducer |
 | Slide whistle | Theremin: the same whistle with a 5-6 Hz vibrato (also answers Q6) |
-| Chimes | Synth (no board space): ghost "wooo" (sine gliding with vibrato), wolf howl, bat chirps, organ minor-chord stab. Recorded (~45 KB/s as WAV, less as MP3): evil laugh, witch cackle |
+| Chimes | Synth (no board space): ghost "wooo", wolf howl, bat chirps, Toccata organ ending on a D minor chord. Recorded (44 KB/s as WAV, ~560 KB in all): two evil laughs, a ghoul cry, a ghost scream (CC0, opengameart.org) |
 
 ### Other themes (ideas)
 

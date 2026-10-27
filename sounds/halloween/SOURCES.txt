@@ -1,0 +1,5 @@
+CC0 sound effects from opengameart.org (public domain, no credit needed), cut by Claude 2026-10-26:
+ laugh.wav   <- laugh-evil-1.ogg  https://opengameart.org/content/evil-laugh
+ laugh2.wav  <- evil_laugh_02.ogg https://opengameart.org/content/evil-laugh-2
+ cry.wav     <- hungry-ghoul.ogg 0-4.4 s https://opengameart.org/content/hungry-ghoul
+ scream.wav  <- scaryhighpitchedghost.ogg 16.5-20.5 s https://opengameart.org/content/scary-high-pitched-ghost

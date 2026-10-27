@@ -24,6 +24,7 @@ Colors defined by Adafruit Led Animation library:
 # TODO: https://learn.adafruit.com/adafruit-neopixel-uberguide/advanced-coding
 
 import math
+import random
 import time
 
 import board
@@ -34,26 +35,30 @@ from adafruit_led_animation.animation.rainbowcomet import RainbowComet
 from adafruit_led_animation.animation.rainbowchase import RainbowChase
 from adafruit_led_animation.animation.rainbowsparkle import RainbowSparkle
 from adafruit_led_animation.animation.chase import Chase
+from adafruit_led_animation.animation.pulse import Pulse
+from adafruit_led_animation.animation.sparkle import Sparkle
+from adafruit_led_animation.animation import Animation
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import helper
 
 import adafruit_led_animation.color as color  # now we can use color.RED, etc.
 
+from config import theme_settings
+
 num_pixels = 64
 anim_speed = 0.1
 brightness = 0.05  # panel brightness when the lights don't follow the music
 
-# Animations in the show (all of them since 2026-10-23); drop a name to switch one off
-SHOW = (
-    "rainbow",
-    "rainbow comet",
-    "rainbow chase columns",
-    "rainbow chase pixels",
-    "rainbow sparkle",
-    "purple comet rows",
-    "amber comet columns",
-    "jade chase rows",
-)
+# Animations in the show come from the theme (themes/*.py); drop a name there to switch one off
+SHOW = theme_settings.SHOW
+
+# Halloween colours
+PUMPKIN = (255, 50, 0)
+GHOUL = (40, 255, 0)  # ghoulish green
+
+# Lightning: white flashes as a chime starts (when the theme has LIGHTNING)
+FLASHES = ((0, 0.06), (0.14, 0.3))  # seconds from the start: (on, off)
+FLASH_BRIGHTNESS = 0.5
 
 # Lights follow the music (MusicPulse): brightness rises with each beat, then fades
 PULSE_MIN = 0.02  # brightness in quiet moments
@@ -76,39 +81,39 @@ def setup_pixels():
     )
 
 
-def make_animations(pixels):
-    """Every animation for the panel, as a list of (name, animation)"""
+def make_animations(pixels, names=None):
+    """Panel animations as a list of (name, animation); all of them, or just names"""
     pixel_wing_vertical = helper.PixelMap.vertical_lines(
         pixels, 8, 8, helper.horizontal_strip_gridmap(8, alternating=False)
     )
     pixel_wing_horizontal = helper.PixelMap.horizontal_lines(
         pixels, 8, 8, helper.horizontal_strip_gridmap(8, alternating=False)
     )
-    return [
-        ("rainbow", Rainbow(pixel_wing_vertical, speed=anim_speed, period=2)),
+    makers = [
+        ("rainbow", lambda: Rainbow(pixel_wing_vertical, speed=anim_speed, period=2)),
         (
             "rainbow comet",
-            RainbowComet(
+            lambda: RainbowComet(
                 pixel_wing_vertical, speed=anim_speed, tail_length=7, bounce=True
             ),
         ),
         (
             "rainbow chase columns",
-            RainbowChase(
+            lambda: RainbowChase(
                 pixel_wing_vertical, speed=anim_speed, size=7, spacing=2, step=8
             ),
         ),
         (
             "rainbow chase pixels",
-            RainbowChase(pixels, speed=anim_speed, size=3, spacing=3),
+            lambda: RainbowChase(pixels, speed=anim_speed, size=3, spacing=3),
         ),
         (
             "rainbow sparkle",
-            RainbowSparkle(pixels, speed=anim_speed, num_sparkles=10),
+            lambda: RainbowSparkle(pixels, speed=anim_speed, num_sparkles=10),
         ),
         (
             "purple comet rows",
-            Comet(
+            lambda: Comet(
                 pixel_wing_horizontal,
                 speed=anim_speed,
                 color=color.PURPLE,
@@ -118,7 +123,7 @@ def make_animations(pixels):
         ),
         (
             "amber comet columns",
-            Comet(
+            lambda: Comet(
                 pixel_wing_vertical,
                 speed=anim_speed,
                 color=color.AMBER,
@@ -128,7 +133,7 @@ def make_animations(pixels):
         ),
         (
             "jade chase rows",
-            Chase(
+            lambda: Chase(
                 pixel_wing_horizontal,
                 speed=anim_speed,
                 size=7,
@@ -136,13 +141,103 @@ def make_animations(pixels):
                 color=color.JADE,
             ),
         ),
+        # Halloween
+        (
+            "pumpkin comet columns",
+            lambda: Comet(
+                pixel_wing_vertical,
+                speed=anim_speed,
+                color=PUMPKIN,
+                tail_length=6,
+                bounce=True,
+            ),
+        ),
+        (
+            "pumpkin pulse",
+            lambda: Pulse(pixels, speed=anim_speed, color=PUMPKIN, period=3),
+        ),
+        ("candle flicker", lambda: CandleFlicker(pixels, speed=anim_speed)),
+        (
+            "purple chase rows",
+            lambda: Chase(
+                pixel_wing_horizontal,
+                speed=anim_speed * 1.5,
+                size=2,
+                spacing=3,
+                color=color.PURPLE,
+            ),
+        ),
+        (
+            "ghoul sparkle",
+            lambda: Sparkle(pixels, speed=anim_speed, color=GHOUL, num_sparkles=6),
+        ),
+        (
+            "ghoul comet rows",
+            lambda: Comet(
+                pixel_wing_horizontal,
+                speed=anim_speed,
+                color=GHOUL,
+                tail_length=5,
+                bounce=True,
+            ),
+        ),
     ]
+    return [
+        (name, make()) for name, make in makers if names is None or name in names
+    ]
+
+
+class CandleFlicker(Animation):
+    """Every pixel a candle flame: orange to yellow, each flickering on its own"""
+
+    def __init__(self, pixel_object, speed):
+        super().__init__(pixel_object, speed, PUMPKIN)
+        self.flames = [random.random() for _ in range(len(pixel_object))]
+
+    def draw(self):
+        for i, flame in enumerate(self.flames):
+            flame = min(max(flame + random.uniform(-0.35, 0.35), 0.15), 1.0)
+            self.flames[i] = flame
+            self.pixel_object[i] = (
+                int(255 * flame), int((30 + 90 * flame) * flame), 0
+            )
+
+
+class Lightning:
+    """A double white flash over the panel; update() is True while it flashes"""
+
+    def __init__(self, pixels):
+        self.pixels = pixels
+        self.start_time = None
+        self.brightness = pixels.brightness
+
+    def start(self):
+        if self.start_time is None:
+            self.brightness = self.pixels.brightness
+        self.start_time = time.monotonic()
+
+    def update(self):
+        """Call often; while it returns True, skip the animations"""
+        if self.start_time is None:
+            return False
+        elapsed = time.monotonic() - self.start_time
+        if elapsed >= FLASHES[-1][1]:
+            self.start_time = None
+            self.pixels.fill(0)
+            self.pixels.brightness = self.brightness
+            self.pixels.show()
+            return False
+        lit = any(on <= elapsed < off for on, off in FLASHES)
+        self.pixels.brightness = FLASH_BRIGHTNESS
+        self.pixels.fill((255, 255, 255) if lit else 0)
+        self.pixels.show()
+        return True
 
 
 def setup_animations():
     """Build the show's animation sequence; returns (sequence, pixels)"""
     pixels = setup_pixels()
-    shown = [anim for name, anim in make_animations(pixels) if name in SHOW]
+    shown = [anim for name, anim in make_animations(pixels, SHOW)]
     sequence = AnimationSequence(*shown, advance_interval=5, random_order=True)
     return sequence, pixels
 

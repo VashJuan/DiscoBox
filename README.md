@@ -20,6 +20,48 @@ The Prop-Maker Feather is mounted on the mailbox door and only has power while
 the door is open. Opening the door starts the show; closing it ends it. All the
 effects below run at the same time.
 
+### Seasonal themes (`themes/`)
+
+The show can be dressed for a season: Halloween now; Thanksgiving, Christmas
+or solstice, St Patrick's and others later (ideas in [IDEAS.md](IDEAS.md)).
+A theme picks the songs, the light animations, the door sound, the chimes
+and the slide whistle's wobble. All themes live together on `main`, not on
+branches, so a fix to the shared code reaches every theme.
+
+| Theme | Lights | Door & chimes | Songs |
+| --- | --- | --- | --- |
+| `generic` | Rainbows, purple, amber & jade | High squeak; doorbell, boing, laser, frog, saucer | The 28 disco clips |
+| `halloween` | Pumpkin orange, purple & ghoul green; candle flicker; a white **lightning** flash with each chime | Slow, lower haunted-door creak; ghost "wooo", wolf howl, bats, Toccata organ, evil laughs, ghoul cry, ghost scream; the whistle wobbles like a theremin | Spooky songs, with a haunted-house echo (or without: `--dry`) |
+
+- Settings: `themes/<name>.py`. Songs & sounds: `sounds/<name>/`, with
+  `playlist.txt` (song order) and any WAV chimes. The board holds only one
+  theme's sounds at a time in `/sounds/` (about 7 MB of space).
+- **Switch themes** (board plugged in as `I:`), in PowerShell 7:
+
+  ```powershell
+  pwsh tools/deploy.ps1 -Theme halloween
+  ```
+
+  It removes the old theme's sounds from the board, copies the new theme's
+  sounds, the code and `lib/`, and sets `theme` in the board's `config.py`.
+  The repo's `config.py` stays `generic`. A new theme starts at its first song.
+- **Make a theme's clips:** add rows to `tools/songs.xlsx` with that Theme,
+  put the full songs in `sounds_workshop/`, then
+  `python tools/make_clips.py --theme halloween` (with the echo) or add
+  `--dry` (without). Both versions can sit side by side in
+  `sounds/halloween/` (`_echo_22k.mp3` and `_22k.mp3`); `playlist.txt` lists
+  the last run's, and only those go to the board.
+- **Recorded chimes** are 22050 Hz mono 16-bit WAVs named in the theme's
+  `CHIMES`. Halloween's are CC0 (public domain) effects from opengameart.org;
+  see `sounds/halloween/SOURCES.txt`.
+- **Next year:** the clips are committed, and each season gets a tag (e.g.
+  `halloween-2026`). The full-length sources in `sounds_workshop/` are
+  **not** in git, so keep that folder in the PC backup.
+- **The tuna can:** the servo turns a painted metal tuna can above the rear
+  top of the mailbox. Magnets hold seasonal figures on it (skeletons,
+  turkeys, Christmas trees, a flag…), so swap those with the theme.
+- Later: a battery-backed clock (DS3231) so the box picks the theme by date.
+
 ### Music
 
 - A song starts about 0.1 s after power-up, before the lights and sensors are
@@ -29,11 +71,13 @@ effects below run at the same time.
   memory, which survives power-off.
 - If the door stays open, the songs play one after another and loop back to the
   start.
-- The playlist (`mp3files` in `config.py`, files in `/sounds/`):
+- The playlist (`/sounds/playlist.txt` on the board, read into `mp3files` in
+  `config.py`; with no playlist, every MP3 in `/sounds/` in name order). The
+  generic theme (`sounds/generic/`):
 
   28 clips, 60 s each with a fade out, in priority order from
-  `sounds_workshop/songs.xlsx` (every song with Priority 14 or better).
-- How the clips are made (`sounds_workshop/make_clips.py`, on the PC):
+  `tools/songs.xlsx` (every song with Priority 14 or better).
+- How the clips are made (`tools/make_clips.py`, on the PC):
   - 22050 Hz mono MP3 at **32 kbps**: 60 s is about 235 KB, so all 28 fit in
     about 6.6 MB of the board's 7.1 MB. At 48 kbps only 16 fitted.
   - 0.5 s fade in, 3 s fade out.
@@ -50,10 +94,11 @@ effects below run at the same time.
   other format still plays, but straight to the speaker, with no volume control
   and no effects over it.
 - New clips: put the full-length song in `sounds_workshop/`, add a row
-  (Priority, start, name, source) to `sounds_workshop/songs.xlsx`, run
-  `python sounds_workshop/make_clips.py`, then paste the list it prints into
-  `mp3files` in `config.py`. Only rows with Priority up to `MAX_PRIORITY` (14)
-  are cut, so 60 s clips fit the board.
+  (Priority, start, name, source, Theme) to `tools/songs.xlsx`, run
+  `python tools/make_clips.py --theme <theme>`, which writes the clips and
+  `playlist.txt` to `sounds/<theme>/`, then `pwsh tools/deploy.ps1 -Theme
+  <theme>`. Only rows with Priority up to `MAX_PRIORITY` (14) are cut, so 60 s
+  clips fit the board.
 
 ### Door squeak & chimes (`creak.py`)
 
@@ -107,8 +152,9 @@ effects below run at the same time.
 
 ### Lights (`lights.py`)
 
-- The external 8x8 NeoPixel panel (64 LEDs, brightness 5%) runs a sequence of
-  eight animations, changing every 5 seconds in random order:
+- The external 8x8 NeoPixel panel (64 LEDs, brightness 5%) runs the theme's
+  animations (`SHOW` in `themes/<name>.py`), changing every 5 seconds in random
+  order. Generic:
   - **Rainbow** – the whole rainbow scrolls across the columns
   - **Rainbow comet** – a rainbow streak bounces back and forth
   - **Rainbow chase (columns)** – rainbow bands march across the panel
@@ -117,6 +163,11 @@ effects below run at the same time.
   - **Purple comet** – a purple streak bounces up and down the rows
   - **Amber comet** – an amber streak bounces across the columns
   - **Jade chase** – jade bands march along the rows
+
+  Halloween: pumpkin comet, pumpkin pulse (slow breathing glow), **candle
+  flicker** (every pixel a flickering flame), purple comet, purple chase,
+  ghoul sparkle (green), ghoul comet and amber comet; plus **lightning**, a
+  double white flash as each chime starts.
 - **Lights follow the music:** the panel's brightness rises on each beat of the
   song and fades between beats (2% in quiet moments, up to 25% on the loudest
   beats). It reads the MP3 decoder's `rms_level` (loudness) and compares it with
@@ -124,16 +175,20 @@ effects below run at the same time.
   (`PULSE_...`) are at the top of `lights.py`; `music_lights = False` in
   `config.py` turns it off (the panel then stays at 5%).
 - To see each animation on its own, copy `test_lights.py` to the board as
-  `code.py`; to drop one from the show, remove its name from `SHOW` in
-  `lights.py`.
+  `code.py`; to drop one from the show, remove its name from `SHOW` in the
+  theme's file (`themes/<name>.py`).
 - The panel sits at the back of the box facing the door, so from outside it
   mostly reads as a shifting glow of colour.
 
 ### Servo (`prop_servo.py`)
 
 - A servo on the servo header sweeps from 0° to 180° and back, 5° every 0.07 s
-  (about 2.5 s each way). It can drive any small prop. (At 5° every 0.2 s the
-  servo did not move, though the code was stepping it; cause unknown.)
+  (about 2.5 s each way). (At 5° every 0.2 s the servo did not move, though
+  the code was stepping it; cause unknown.)
+- It turns a painted metal tuna can mounted above the rear top of the
+  mailbox, so the can rotates while the door is open. Magnets hold seasonal
+  figures on the can (skeletons, turkeys, Christmas trees, a flag…), swapped
+  to match the theme.
 
 ### Sensors
 
@@ -154,7 +209,8 @@ effects below run at the same time.
 | Setting | What it does |
 | --- | --- |
 | `production` | `True`: fast start, music first, no debug printing. `False`: play the start-up audio tests first and print debug information to the serial console. |
-| `mp3files` | The playlist, in order. |
+| `theme` | The seasonal theme (a file in `themes/`). Set on the board by `tools/deploy.ps1`; `generic` in the repo. |
+| `mp3files` | The playlist, in order, read from `sounds/playlist.txt`. |
 | `door_creak` | `True` to play the door squeak & chimes. |
 | `slide_whistle` | `True` to play the slide whistle. |
 
@@ -163,7 +219,8 @@ effects below run at the same time.
 | File | Purpose |
 | --- | --- |
 | `main.py` | Starts the music, sets up the hardware, then runs the main loop |
-| `config.py` | Settings |
+| `config.py` | Settings & the playlist |
+| `themes/` | One file per seasonal theme: lights, door sound, chimes, whistle |
 | `sound.py` | Speaker output, mixer, playlist & start-up audio tests |
 | `creak.py` | Door squeak & chimes |
 | `whistle.py` | Slide whistle |
@@ -172,7 +229,8 @@ effects below run at the same time.
 | `sensors.py` | Distance sensor & accelerometer |
 | `arpy_mode/` | Arpeggiator, experimental; not part of the show |
 | `test_creak.py`, `test_distance.py`, `test_lights.py`, `test_servo.py` | Test one part on its own (see below) |
-| `tools/` | PC-only: `make_clips.py` cuts board clips from `songs.csv` start times |
+| `tools/` | PC-only: `make_clips.py` cuts a theme's clips from `songs.xlsx`; `deploy.ps1` puts the show & one theme on the board |
+| `sounds/<theme>/` | Each theme's clips, `playlist.txt` & WAV chimes (the board gets one theme's, in `/sounds/`) |
 | `sounds_workshop/` | Full-length song sources (local only, not in git or on the board) |
 | `references/` | Datasheets, guides & sample code (local only, not in git) |
 
@@ -185,9 +243,9 @@ instead of `main.py`. Each prints what it is doing to the serial console. Delete
 | Script | What you should hear or see |
 | --- | --- |
 | `test_creak.py` | The old creak (no longer in `creak.py`; may need updating): a beep, then pretend door swings |
-| `test_door_sounds.py` | Eight door sounds over a ducked song, each after 1-8 beeps: squeak, doorbell, boing, ta-da, cuckoo, laser, frog, saucer. With a serial console open it waits for a number (1-8, Enter); otherwise it loops through all eight |
+| `test_door_sounds.py` | 13 door sounds over a ducked song, each after 1-13 beeps: squeak, doorbell, boing, ta-da, cuckoo, laser, frog, saucer, then Halloween's ghost, howl, bats, organ, and every WAV chime of the theme on the board. With a serial console open it waits for a number (1-13, Enter); otherwise it loops through them all |
 | `test_distance.py` | A beep, the I2C addresses found (VL53L1X = `0x29`), then a tone that rises as your hand gets closer |
-| `test_lights.py` | Every panel animation, 8 s each, name on the serial console |
+| `test_lights.py` | Every panel animation of every theme, 8 s each, name on the serial console |
 | `test_servo.py` | The servo moves to 0°, 90°, 180° and 90°, 2 s each, then sweeps |
 
 Ideas for new effects, and what has been tried, are in [IDEAS.md](IDEAS.md).
