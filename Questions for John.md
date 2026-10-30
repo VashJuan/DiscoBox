@@ -82,3 +82,9 @@
   whistle. Too easy or too hard to set off? Should the scream & cry also stay
   in the door chimes, or only be beam sounds? Add the laughs to the beam too?
   (`BEAM_SOUNDS` in themes\halloween.py; tuning at the bottom of whistle.py.)
+  - 2026-10-30: John: "somewhat quiet & sounds like Gollum, with a church
+    gong at the start", then "all seems great" and installed it. Ideas for
+    later: louder (compress the WAVs; duck the song to 0.08, not 0.25); swap
+    cry.wav (a "hungry ghoul", the Gollum one) for a CC0 female scream
+    (opengameart.org/node/131040 or /node/147410; check licence). The gong is
+    likely the organ (Toccata) door chime playing at the same time.
