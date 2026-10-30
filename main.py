@@ -67,7 +67,11 @@ timing("libraries imported")
 #################################################
 # Set up the hardware
 i2c = board.STEMMA_I2C()  # Use built-in STEMMA QT connector on RP2040
-vl53 = sensors.setup_tof(i2c)
+try:
+    vl53 = sensors.setup_tof(i2c)
+except ValueError as error:  # no distance sensor plugged in: play the show without it
+    print("No distance sensor:", error)
+    vl53 = None
 prop_servo = ServoSweep()
 animations, pixels = lights.setup_animations()
 lis3dh = sensors.setup_accelerometer()
@@ -104,7 +108,7 @@ def tick():
 
     # -----------------
     # region Measure distance
-    if vl53.data_ready:
+    if vl53 and vl53.data_ready:
         distance = vl53.distance  # cm, or None when nothing is in range
         vl53.clear_interrupt()
         if verbose and not loop_inner % 25:
