@@ -77,3 +77,8 @@
   picked each song's loudest minute (Monster Mash, Toccata & Addams Family
   from the top); Thriller starts 9:37 into the short film, so check that one.
   Somebody's Watching Me and Werewolves of London are still to download.
+- **Q17** (2026-10-30): Halloween now plays the scream or cry (taking turns)
+  when something comes into the distance sensor's beam, instead of the
+  whistle. Too easy or too hard to set off? Should the scream & cry also stay
+  in the door chimes, or only be beam sounds? Add the laughs to the beam too?
+  (`BEAM_SOUNDS` in themes\halloween.py; tuning at the bottom of whistle.py.)
