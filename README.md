@@ -196,6 +196,11 @@ branches, so a fix to the shared code reaches every theme.
   mode it also prints "Tapped!" and "Shaken!".
 - **Distance sensor (VL53L1X):** measures up to about 1.3 m, about 10 times a
   second. Drives the slide whistle; in debug mode the reading is also printed.
+- **Missing parts:** the show goes on if a part is unplugged or drops out. Without
+  the distance sensor there is no whistle (it is looked for again every 5 s, so
+  plugging it back in brings the whistle back); without the accelerometer, no door
+  sounds. The servo, NeoPixel panel and speaker are outputs, so unplugging them
+  never stops the show.
 
 ### Arpeggiator mode (experimental)
 

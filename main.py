@@ -66,15 +66,35 @@ timing("libraries imported")
 
 #################################################
 # Set up the hardware
+# The show goes on if a sensor is missing or drops out: the servo, NeoPixels
+# & speaker are outputs that never fail when unplugged, but the I2C sensors raise
 i2c = board.STEMMA_I2C()  # Use built-in STEMMA QT connector on RP2040
-try:
-    vl53 = sensors.setup_tof(i2c)
-except ValueError as error:  # no distance sensor plugged in: play the show without it
-    print("No distance sensor:", error)
-    vl53 = None
+TOF_RETRY = 5  # seconds between tries to find a missing distance sensor
+tof_tried = 0
+
+
+def connect_tof():
+    """The distance sensor, or None if it isn't plugged in (tried every TOF_RETRY s)"""
+    global tof_tried
+    tof_tried = time.monotonic()
+    try:
+        return sensors.setup_tof(i2c)
+    except (ValueError, OSError, RuntimeError) as error:
+        if verbose:
+            print("No distance sensor:", error)
+        return None
+
+
+vl53 = connect_tof()
+if vl53 is None:
+    print("No distance sensor: the show goes on without the whistle")
 prop_servo = ServoSweep()
 animations, pixels = lights.setup_animations()
-lis3dh = sensors.setup_accelerometer()
+try:
+    lis3dh = sensors.setup_accelerometer()
+except (ValueError, OSError, RuntimeError) as error:
+    print("No accelerometer: the show goes on without the door sounds:", error)
+    lis3dh = None
 timing("sensors, servo & lights set up")
 
 lightning = lights.Lightning(pixels) if theme_settings.LIGHTNING else None
@@ -101,35 +121,50 @@ loop_inner = 0
 
 def tick():
     """One pass of sensors, lights & servo; runs while a song plays"""
-    global loop_inner
+    global loop_inner, vl53
     loop_inner += 1
     if verbose and (not loop_inner % 100):
         print("Inner Loop count: ", loop_inner)
 
     # -----------------
     # region Measure distance
-    if vl53 and vl53.data_ready:
-        distance = vl53.distance  # cm, or None when nothing is in range
-        vl53.clear_interrupt()
-        if verbose and not loop_inner % 25:
-            print("Distance: {} cm".format(distance))
+    if vl53 is None and time.monotonic() - tof_tried > TOF_RETRY:
+        vl53 = connect_tof()
+        if vl53:
+            print("Distance sensor found")
+    try:
+        if vl53 and vl53.data_ready:
+            distance = vl53.distance  # cm, or None when nothing is in range
+            vl53.clear_interrupt()
+            if verbose and not loop_inner % 25:
+                print("Distance: {} cm".format(distance))
+            if whistle:
+                whistle.distance(distance)
+    except (OSError, RuntimeError) as error:  # unplugged mid-show
+        print("Distance sensor lost:", error)
+        vl53 = None
         if whistle:
-            whistle.distance(distance)
+            whistle.distance(None)
     if whistle:
         whistle.update()
     # endregion
 
     # -----------------
     # region Read LIS3DH values
-    x, y, z = sensors.read_acceleration(lis3dh)
-    if verbose and lis3dh.tapped:
-        print("Tapped!")
-    # lis3dh.shake() averages readings over a 0.1 s sleep, which stalled the
-    # animations; check the reading we already have instead (12 m/s^2 ~ 1.22 G)
-    if verbose and (x * x + y * y + z * z) > 1.22**2:
-        print("Shaken!")
-    if creak:
-        creak.update(x, y, z)
+    if lis3dh:
+        try:
+            x, y, z = sensors.read_acceleration(lis3dh)
+            if verbose and lis3dh.tapped:
+                print("Tapped!")
+        except (OSError, RuntimeError) as error:
+            print("Accelerometer read failed:", error)
+        else:
+            # lis3dh.shake() averages readings over a 0.1 s sleep, which stalled the
+            # animations; check the reading we already have instead (12 m/s^2 ~ 1.22 G)
+            if verbose and (x * x + y * y + z * z) > 1.22**2:
+                print("Shaken!")
+            if creak:
+                creak.update(x, y, z)
     # endregion
 
     # Turn the song down while an effect plays
