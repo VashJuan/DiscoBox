@@ -26,3 +26,5 @@ CHIMES = ("doorbell", "boing", "laser", "frog", "saucer")
 
 # Slide whistle (whistle.py): wobble in octaves; 0 = a plain whistle
 WHISTLE_VIBRATO = 0
+# WAVs in sounds/ to play instead of the whistle (whistle.BeamSounds); () = the whistle
+BEAM_SOUNDS = ()

@@ -8,17 +8,19 @@ moving through the beam changes the reading. While it changes, the whistle
 plays: high when near, low when far, gliding between readings. Once readings
 stop changing (or nothing is in range) it fades out.
 A theme can add a wobble (WHISTLE_VIBRATO), so it sounds like a theremin.
+A theme with BEAM_SOUNDS (WAV files) plays one of them instead (BeamSounds).
 """
 
 import array
 import math
+import random
 import time
 
 import synthio
 
-from config import verbose, theme_settings
+from config import verbose, theme_settings, sound_dir
 from sound import MIXER_SAMPLE_RATE, MIXER_CHANNELS
-from creak import map_range
+from creak import map_range, Recording
 
 # Tuning
 NEAR, FAR = 3, 130  # cm; the sensor's short-range limits
@@ -88,3 +90,51 @@ class SlideWhistle:
             return
         step = min(elapsed / GLIDE, 1)
         self.note.frequency += step * (self.target - self.note.frequency)
+
+
+BEAM_REST = 3  # seconds after a beam sound ends before another can start
+BEAM_APPROACH_CM = 10  # moving this much closer between readings starts one
+
+
+class BeamSounds:
+    """Plays a recorded scream, cry... (the theme's BEAM_SOUNDS) on mixer voice 2
+    when something comes into the beam or moves in quickly. Same calls as
+    SlideWhistle, which it replaces."""
+
+    def __init__(self, mixer):
+        voice = mixer.voice[2]
+        self.sounds = []
+        for name in theme_settings.BEAM_SOUNDS:
+            try:
+                open(sound_dir + name, "rb").close()
+            except OSError:
+                print("No", sound_dir + name, "- beam sound left out")
+                continue
+            self.sounds.append(Recording(voice, sound_dir + name))
+        self.sound = None  # the one playing
+        self.last_sound = None
+        self.last_distance = None
+        self.ended = -BEAM_REST
+        self.playing = False
+
+    def distance(self, cm):
+        """Call with each new reading: cm, or None when nothing is in range"""
+        last, self.last_distance = self.last_distance, cm
+        if cm is None or self.playing or not self.sounds:
+            return
+        if time.monotonic() - self.ended < BEAM_REST:
+            return
+        if last is not None and last - cm < BEAM_APPROACH_CM:
+            return  # already in the beam & not moving in
+        choices = [s for s in self.sounds if s is not self.last_sound] or self.sounds
+        self.sound = self.last_sound = random.choice(choices)
+        if verbose:
+            print("Beam sound at {} cm: {}".format(cm, self.sound.path))
+        self.sound.play()
+        self.playing = True
+
+    def update(self):
+        """Call often: notices when the sound has finished"""
+        if self.playing and not self.sound.update():
+            self.playing = False
+            self.ended = time.monotonic()

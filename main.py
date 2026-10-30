@@ -107,9 +107,10 @@ if door_creak:
 
 whistle = None
 if slide_whistle:
-    from whistle import SlideWhistle
+    from whistle import SlideWhistle, BeamSounds
 
-    whistle = SlideWhistle(mixer)
+    # a theme's BEAM_SOUNDS (e.g. Halloween's scream & cry) replace the whistle
+    whistle = BeamSounds(mixer) if theme_settings.BEAM_SOUNDS else SlideWhistle(mixer)
 
 ducker = sound.SongDucker(mixer)
 

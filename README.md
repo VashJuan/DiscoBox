@@ -31,7 +31,7 @@ branches, so a fix to the shared code reaches every theme.
 | Theme | Lights | Door & chimes | Songs |
 | --- | --- | --- | --- |
 | `generic` | Rainbows, purple, amber & jade | High squeak; doorbell, boing, laser, frog, saucer | The 28 disco clips |
-| `halloween` | Pumpkin orange, purple & ghoul green; candle flicker; a white **lightning** flash with each chime | Slow, lower haunted-door creak; ghost "wooo", wolf howl, bats, Toccata organ, evil laughs, ghoul cry, ghost scream; the whistle wobbles like a theremin | Spooky songs, with a haunted-house echo (or without: `--dry`) |
+| `halloween` | Pumpkin orange, purple & ghoul green; candle flicker; a white **lightning** flash with each chime | Slow, lower haunted-door creak; ghost "wooo", wolf howl, bats, Toccata organ, evil laughs, ghoul cry, ghost scream; a scream or cry (not the whistle) when something comes into the distance sensor's beam | Spooky songs, with a haunted-house echo (or without: `--dry`) |
 
 - Settings: `themes/<name>.py`. Songs & sounds: `sounds/<name>/`, with
   `playlist.txt` (song order) and any WAV chimes. The board holds only one
@@ -148,6 +148,10 @@ branches, so a fix to the shared code reaches every theme.
   `slide_whistle = False` in `config.py`.
 - Status: tried on the board 2026-10-22: "not like a whistle, but
   reasonable". Raised from 1800-500 Hz to 2500-700 Hz to sound a bit higher.
+- **Beam sounds instead:** a theme with `BEAM_SOUNDS` (WAV files) plays one of
+  them in place of the whistle when something comes into the beam, or moves
+  10 cm or more closer between readings. Halloween's are the scream and the cry,
+  taking turns; another can start 3 s after one ends.
   A little vibrato might make it more whistle-like (idea).
 
 ### Lights (`lights.py`)

@@ -36,3 +36,6 @@ CHIMES = (
 
 # Slide whistle (whistle.py) as a theremin: wobble in octaves
 WHISTLE_VIBRATO = 0.04
+# Instead of the whistle: a WAV in sounds/ when a hand or mail comes into the
+# distance sensor's beam (whistle.BeamSounds); () = the whistle
+BEAM_SOUNDS = ("scream.wav", "cry.wav")
