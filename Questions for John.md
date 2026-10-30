@@ -71,3 +71,9 @@
   `test_door_sounds.py` as `code.py` (sounds 9-13). Ghost, howl, bats, organ,
   laughs, cry & scream: too loud, quiet, long or harsh? Is the slower creak
   still static-y? Lightning flash with each chime: too bright or too much?
+  - 2026-10-30: clips cut (echo & dry) and the echo set deployed to I:. Songs
+    are in D:\Muzak\JohnsMusic\halloween. Feedback on the rest still open.
+- **Q16** (2026-10-30): Do the Halloween start times sound right? Claude
+  picked each song's loudest minute (Monster Mash, Toccata & Addams Family
+  from the top); Thriller starts 9:37 into the short film, so check that one.
+  Somebody's Watching Me and Werewolves of London are still to download.
