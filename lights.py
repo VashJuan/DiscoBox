@@ -43,7 +43,7 @@ from adafruit_led_animation import helper
 
 import adafruit_led_animation.color as color  # now we can use color.RED, etc.
 
-from config import theme_settings
+from config import theme_settings, led_max
 
 num_pixels = 64
 anim_speed = 0.1
@@ -62,7 +62,7 @@ FLASH_BRIGHTNESS = 0.5
 
 # Lights follow the music (MusicPulse): brightness rises with each beat, then fades
 PULSE_MIN = 0.02  # brightness in quiet moments
-PULSE_MAX = 0.25  # brightness on the loudest beats
+PULSE_MAX = led_max  # brightness on the loudest beats (config.py)
 PULSE_FADE = 0.15  # seconds for a pulse to fade by ~2/3 (rises are instant)
 PEAK_FADE = 4.0  # seconds for the loudness reference to settle after a loud part
 BEAT_FLOOR = 0.8  # 0-1; loudness below this share of the recent average stays dim
