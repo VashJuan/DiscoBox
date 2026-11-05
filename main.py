@@ -110,13 +110,13 @@ timing("sensors, servo & lights set up")
 lightning = lights.Lightning(pixels) if theme_settings.LIGHTNING else None
 
 creak = None
-if door_creak:
+if door_creak and accelerometer:  # creak & chimes need the accelerometer
     from creak import DoorCreak
 
     creak = DoorCreak(mixer, on_chime=lightning.start if lightning else None)
 
 whistle = None
-if slide_whistle:
+if slide_whistle and distance_sensor:  # whistle & beam sounds need the distance sensor
     from whistle import SlideWhistle, BeamSounds
 
     # a theme's BEAM_SOUNDS (e.g. Halloween's scream & cry) replace the whistle
