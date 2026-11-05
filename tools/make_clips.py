@@ -103,7 +103,9 @@ def measure(path, start=0, length=None, before=""):
         check=True, capture_output=True, text=True, encoding="utf-8",
     )
     log = result.stderr
-    return json.loads(log[log.rindex("{"):log.rindex("}") + 1])
+    # the JSON block around "input_i" (tags printed after it may hold braces)
+    key = log.rindex('"input_i"')
+    return json.loads(log[log.rindex("{", 0, key):log.index("}", key) + 1])
 
 
 def loudnorm(source, start, length, extra=""):
@@ -142,7 +144,7 @@ def make_sfx(name, source, start, length, level, eq):
 
 
 def make_clip(row, out_dir, extra="", gain=0, echo=False):
-    """Cut one clip with ffmpeg; returns its file name
+    """Cut one clip with ffmpeg (audio only: -vn drops album art); returns its file name
 
     gain (dB) corrects a clip that loudnorm left too quiet or loud; a limiter
     then keeps its peaks under PEAK.
@@ -161,7 +163,7 @@ def make_clip(row, out_dir, extra="", gain=0, echo=False):
         [
             "ffmpeg", "-v", "error", "-y",
             "-ss", str(start), "-t", str(length), "-i", source,
-            "-af", filters, "-ac", "1", "-ar", "22050", "-b:a", "32k",
+            "-vn", "-af", filters, "-ac", "1", "-ar", "22050", "-b:a", "32k",
             "-map_metadata", "-1", "-id3v2_version", "0", "-write_xing", "0",
             os.path.join(out_dir, out_name),
         ],

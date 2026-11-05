@@ -219,7 +219,7 @@ breakout (SPI) would hold every theme. Until then, switch by hand.
 
 | Theme | Colours | Sounds & chimes |
 | --- | --- | --- |
-| Thanksgiving | Amber, gold, brown, deep red | Turkey gobble chime, harvest/folk songs |
+| Thanksgiving | Built 2026-11-05: fall leaves, rain, storm, cold blue front (README) | Gobble, geese, rain patter, wind, thunder; KEXP-style rain & storm songs, not traditional ones (John) |
 | Christmas | Red, green, warm white; twinkle sparkle | Sleigh bells, carols, "ho ho ho" |
 | Solstice | Deep blue, ice white, a little gold | Wind chimes, slow bell tones |
 | St Patrick's | Greens and gold | Jigs & reels; slide whistle as a tin whistle |

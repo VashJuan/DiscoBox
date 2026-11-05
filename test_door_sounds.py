@@ -6,7 +6,7 @@
 To run: copy this file to the board as code.py (it runs instead of main.py).
 Delete code.py from the board to go back to the normal show.
 
-With a serial console connected it waits for a sound's number (1-13, then Enter);
+With a serial console connected it waits for a sound's number (1-18, then Enter);
 otherwise it plays each sound in turn over a song turned down as the show ducks it, so they
 can be judged outdoors against the music. All are synthesized (no sound files)
 and sit above ~300 Hz, where the transducer is loud. Beeps first tell which:
@@ -24,6 +24,12 @@ Halloween chimes (creak.py):
   11 beeps: bats    - high chirps
   12 beeps: organ   - Toccata in D minor
   13 beeps: recordings - every WAV chime of the theme found in sounds/
+Thanksgiving chimes (creak.py):
+  14 beeps: gobble  - turkey
+  15 beeps: geese   - honking south
+  16 beeps: patter  - rain on the mailbox
+  17 beeps: wind    - a gust past the box
+  18 beeps: thunder - crack & rumble (the show also flashes the lights)
 """
 
 import array
@@ -205,6 +211,26 @@ def organ():
     chime(creak.Organ)
 
 
+def gobble():
+    chime(creak.Gobble)
+
+
+def geese():
+    chime(creak.Geese)
+
+
+def patter():
+    chime(creak.Patter)
+
+
+def wind():
+    chime(creak.Wind)
+
+
+def thunder():
+    chime(creak.Thunder)
+
+
 def recordings():
     """Each recorded chime of the theme that is on the board"""
     for recording in creak.make_chimes(synth, mixer.voice[3]):
@@ -219,6 +245,7 @@ def recordings():
 SOUNDS = [
     squeak, doorbell, boing, ta_da, cuckoo, laser, frog, saucer,
     ghost, howl, bats, organ, recordings,
+    gobble, geese, patter, wind, thunder,
 ]
 
 
@@ -230,8 +257,8 @@ def play_sound(number):
 
 
 if supervisor.runtime.serial_connected:
-    # on demand: type a sound's number (1-13) and Enter in the serial console
-    print("Type 1-13 and Enter to play a sound")
+    # on demand: type a sound's number (1-18) and Enter in the serial console
+    print("Type 1-18 and Enter to play a sound")
     line = ""
     while True:
         keep_song_playing()

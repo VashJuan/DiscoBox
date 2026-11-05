@@ -88,3 +88,12 @@
     cry.wav (a "hungry ghoul", the Gollum one) for a CC0 female scream
     (opengameart.org/node/131040 or /node/147410; check licence). The gong is
     likely the organ (Toccata) door chime playing at the same time.
+- **Q18** (2026-11-05): Thanksgiving is ready to try:
+  `pwsh tools/deploy.ps1 -Theme thanksgiving`. Copy `test_door_sounds.py`
+  as `code.py` for the new chimes (14 gobble, 15 geese, 16 rain patter,
+  17 wind, 18 thunder), and `test_lights.py` for the 11 animations. Do the
+  rain and leaves fall down, not up (else `TOP_ROW = 7` in lights.py)? Is
+  the synth thunder convincing, or should we find a CC0 thunder & rain
+  recording? The 19 songs are all from D:\\Muzak (list & start times in
+  tools/songs.xlsx): any to drop or swap? Starts are each song's loudest
+  minute; Riders on the Storm starts from the top (the rain intro).

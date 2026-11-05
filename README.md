@@ -32,6 +32,7 @@ branches, so a fix to the shared code reaches every theme.
 | --- | --- | --- | --- |
 | `generic` | Rainbows, purple, amber & jade | High squeak; doorbell, boing, laser, frog, saucer | The 28 disco clips |
 | `halloween` | Pumpkin orange, purple & ghoul green; candle flicker; a white **lightning** flash with each chime | Slow, lower haunted-door creak; ghost "wooo", wolf howl, bats, Toccata organ, evil laughs, ghoul cry, ghost scream; a scream or cry (not the whistle) when something comes into the distance sensor's beam | Spooky songs, with a haunted-house echo (or without: `--dry`) |
+| `thanksgiving` | Fall leaves (amber, gold, rust, cranberry), the hearth's candle flicker, with cold blue coming in; lots of **rain** and a **storm**; a blue-white lightning flash with each thunder chime | A lower, wet-hinge squeak; turkey gobble, geese flying south, rain patter, a wind gust, thunder (crack & rumble, just after the flash) | 19 KEXP-style rain, storm & fall songs (Fleet Foxes, Modest Mouse, The Doors, Gorillaz, Soundgarden & Brandi Carlile...) |
 
 - Settings: `themes/<name>.py`. Songs & sounds: `sounds/<name>/`, with
   `playlist.txt` (song order) and any WAV chimes. The board holds only one
@@ -172,6 +173,15 @@ branches, so a fix to the shared code reaches every theme.
   flicker** (every pixel a flickering flame), purple comet, purple chase,
   ghoul sparkle (green), ghoul comet and amber comet; plus **lightning**, a
   double white flash as each chime starts.
+
+  Thanksgiving: **leaf fall** (leaves drifting down and piling up at the
+  bottom), **leaves in the rain**, harvest pulse (rust), candle flicker (the
+  hearth), amber comet, cranberry comet, **cold front** (a band of cold blue
+  pushing into the fall colours and back), ice sparkle, **drizzle**,
+  **downpour** (raindrops splashing at the bottom) and **storm** (dark clouds
+  rolling, lit from inside); plus a blue-white lightning flash as each
+  thunder chime starts (`LIGHTNING = ("thunder",)`). If the rain and leaves
+  fall upwards, set `TOP_ROW = 7` in `lights.py`.
 - **Lights follow the music:** the panel's brightness rises on each beat of the
   song and fades between beats (2% in quiet moments, up to 25% on the loudest
   beats). It reads the MP3 decoder's `rms_level` (loudness) and compares it with

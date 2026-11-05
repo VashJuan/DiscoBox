@@ -11,7 +11,8 @@ gravity turn as the door swings.
 - Chimes: while the door stays still, every 30-50 seconds one of the theme's
   chimes (CHIMES in themes/*.py): a doorbell "ding-dong", a cartoon "boing", a
   laser "pew pew pew", a frog "ribbit", a flying saucer; for Halloween a ghost,
-  a wolf howl, bats, a spooky organ, or a recorded WAV (evil laugh, cries).
+  a wolf howl, bats, a spooky organ, or a recorded WAV (evil laugh, cries);
+  for Thanksgiving a turkey gobble, geese, rain patter, wind or thunder.
 """
 
 import array
@@ -393,6 +394,171 @@ class Organ:
         return elapsed < self.LENGTH
 
 
+# Thanksgiving & Pacific Northwest weather
+
+# random samples: played slowly a low rumble, quickly a hiss
+random.seed(1)
+NOISE = array.array("h", [random.randint(-30000, 30000) for _ in range(512)])
+random.seed()
+# LFO shape for thunder: uneven swells between 0.3 and 1
+RUMBLE = array.array("h", [32767, 12000, 26000, 9800, 30000, 16000, 22000, 10000])
+
+
+class Gobble(Repeats):
+    """Turkey gobble: two gargling bursts, each falling in pitch"""
+
+    COUNT = 2
+    EVERY = 0.8
+    TAIL = 0.65
+
+    def make_note(self):
+        fall = synthio.LFO(waveform=RAMP_UP, rate=1 / 0.6, scale=-0.5, once=True)
+        return synthio.Note(
+            frequency=random.uniform(650, 760),
+            waveform=SAW,
+            # a fast on-off gargle, its pitch shaking as it falls
+            amplitude=synthio.LFO(waveform=CROAK, rate=19, scale=CHIME_LEVEL),
+            bend=synthio.LFO(rate=19, scale=0.12, offset=fall),
+            envelope=synthio.Envelope(
+                attack_time=0.01, decay_time=0.6, sustain_level=0.3, release_time=0.08
+            ),
+        )
+
+
+class Geese(Repeats):
+    """Canada geese flying south: a few nasal honks"""
+
+    COUNT = 5
+    EVERY = 0.3
+    TAIL = 0.25
+
+    def make_note(self):
+        return synthio.Note(
+            frequency=random.uniform(420, 540),
+            waveform=SAW,
+            amplitude=CHIME_LEVEL * random.uniform(0.6, 1.0),  # near & far birds
+            bend=synthio.LFO(waveform=RAMP_UP, rate=1 / 0.1, scale=0.3, once=True),
+            envelope=synthio.Envelope(
+                attack_time=0.01, decay_time=0.18, sustain_level=0, release_time=0.05
+            ),
+        )
+
+
+class Patter:
+    """Rain on the mailbox: drops plinking at random over a soft hiss"""
+
+    LENGTH = 3.0  # seconds
+    DROPS = 30
+
+    def __init__(self, synth):
+        self.synth = synth
+        self.hiss = synthio.Note(
+            frequency=1800,  # the noise wave played fast: a hiss
+            waveform=NOISE,
+            amplitude=CHIME_LEVEL * 0.12,
+            envelope=synthio.Envelope(
+                attack_time=0.8, decay_time=0.1, sustain_level=1, release_time=0.8
+            ),
+        )
+        self.times = []
+        self.drop = None
+        self.start = None
+
+    def play(self):
+        self.start = time.monotonic()
+        self.times = sorted(random.uniform(0, self.LENGTH) for _ in range(self.DROPS))
+        self.synth.press(self.hiss)
+
+    def update(self):
+        """Returns False once finished"""
+        elapsed = time.monotonic() - self.start
+        if elapsed >= self.LENGTH:
+            self.synth.release((self.hiss, self.drop) if self.drop else self.hiss)
+            return False
+        if self.times and elapsed >= self.times[0]:
+            self.times.pop(0)
+            if self.drop:
+                self.synth.release(self.drop)
+            self.drop = synthio.Note(
+                frequency=random.uniform(1400, 3800),
+                waveform=SINE,
+                amplitude=CHIME_LEVEL * random.uniform(0.2, 0.6),
+                bend=synthio.LFO(waveform=RAMP_UP, rate=1 / 0.03, scale=0.4, once=True),
+                envelope=synthio.Envelope(
+                    attack_time=0.001, decay_time=0.04, sustain_level=0, release_time=0.02
+                ),
+            )
+            self.synth.press(self.drop)
+        return True
+
+
+class Wind(Glide):
+    """Wind gusting past the mailbox: a breathy whistle that rises and falls"""
+
+    WAVE = HOLLOW
+    PATH = ((0, 480), (1.1, 820), (1.9, 600), (2.8, 940), (3.8, 500))
+    WOBBLE = (0.8, 0.05)
+    ENVELOPE = (0.9, 1.0)
+
+
+class Thunder:
+    """Thunder: a crack, then a long uneven rumble.
+
+    Comes a moment after the lightning (the theme's LIGHTNING flashes as the
+    chime starts), as if the storm were a few miles off. The transducer is
+    weak below ~300 Hz, so the rumble is noise rather than a low tone.
+    """
+
+    LENGTH = 3.6  # seconds, from the flash
+
+    def __init__(self, synth):
+        self.synth = synth
+        self.crack = synthio.Note(
+            frequency=160,
+            waveform=NOISE,
+            amplitude=CHIME_LEVEL,
+            envelope=synthio.Envelope(
+                attack_time=0.005, decay_time=0.35, sustain_level=0, release_time=0.1
+            ),
+        )
+        rumble = synthio.Envelope(
+            attack_time=0.2, decay_time=2.6, sustain_level=0, release_time=0.3
+        )
+        self.rumbles = [
+            synthio.Note(
+                frequency=hz,
+                waveform=NOISE,
+                envelope=rumble,
+                amplitude=synthio.LFO(
+                    waveform=RUMBLE, rate=rate, scale=CHIME_LEVEL * 0.55
+                ),
+            )
+            for hz, rate in ((43, 2.3), (61, 3.1))
+        ]
+        self.delay = 0
+        self.start = None
+        self.cracked = self.rumbling = False
+
+    def play(self):
+        self.start = time.monotonic()
+        self.delay = random.uniform(0.2, 0.8)  # flash first, then the sound
+        self.cracked = self.rumbling = False
+
+    def update(self):
+        """Returns False once finished"""
+        elapsed = time.monotonic() - self.start - self.delay
+        if elapsed >= self.LENGTH:
+            self.synth.release([self.crack] + self.rumbles)
+            return False
+        if elapsed >= 0 and not self.cracked:
+            self.synth.press(self.crack)
+            self.cracked = True
+        if elapsed >= 0.15 and not self.rumbling:
+            self.synth.press(self.rumbles)
+            self.rumbling = True
+        return True
+
+
 class Recording:
     """A recorded chime: a WAV file played on mixer voice 3"""
 
@@ -425,6 +591,11 @@ CHIMES = {
     "howl": Howl,
     "bats": Bats,
     "organ": Organ,
+    "gobble": Gobble,
+    "geese": Geese,
+    "patter": Patter,
+    "wind": Wind,
+    "thunder": Thunder,
 }
 
 
@@ -433,7 +604,9 @@ def make_chimes(synth, voice):
     chimes = []
     for name in theme_settings.CHIMES:
         if not name.endswith(".wav"):
-            chimes.append(CHIMES[name](synth))
+            chime = CHIMES[name](synth)
+            chime.name = name  # e.g. so only the thunder flashes the lights
+            chimes.append(chime)
             continue
         try:
             open(sound_dir + name, "rb").close()
@@ -441,14 +614,17 @@ def make_chimes(synth, voice):
             if verbose:
                 print("No", sound_dir + name, "- chime left out")
             continue
-        chimes.append(Recording(voice, sound_dir + name))
+        chime = Recording(voice, sound_dir + name)
+        chime.name = name
+        chimes.append(chime)
     return chimes
 
 
 class DoorCreak:
     """Plays on mixer voice 1 (recorded chimes on voice 3), over the song on voice 0
 
-    on_chime, if given, is called as each chime starts (e.g. to flash the lights).
+    on_chime, if given, is called with the chime's name as each chime starts
+    (e.g. to flash the lights).
     """
 
     def __init__(self, mixer, on_chime=None):
@@ -529,7 +705,7 @@ class DoorCreak:
                 self.chime = random.choice(self.chimes)
                 self.chime.play()
                 if self.on_chime:
-                    self.on_chime()
+                    self.on_chime(self.chime.name)
                 self.still_since = now
                 self.chime_gap = random.uniform(*CHIME_GAP)
             return
