@@ -18,9 +18,15 @@ A theme may add a sound of its own (THEME_SOUND), e.g. Halloween's
 haunted-house echo; those clips are named <name>_echo_22k.mp3, and --dry cuts
 them without it, so both can be compared. playlist.txt lists the last run's.
 
+Every clip gets SPEAKER_EQ first: the mailbox's small exciter can't make deep
+bass (it only buzzes the panel), so a high-pass drops it and a gentle boost
+brings out voices & screams. --flat leaves the EQ out, for comparison.
+--sfx re-cuts the theme's WAV effects (SFX, from sounds_workshop) with the EQ.
+
     python tools/make_clips.py                     (generic)
     python tools/make_clips.py --theme halloween   (with the echo)
     python tools/make_clips.py --theme halloween --dry
+    python tools/make_clips.py --theme halloween --sfx     (scream, cry, laughs)
 """
 
 import argparse
@@ -51,6 +57,21 @@ BOARD_SPACE_KB = 7000  # roughly what CIRCUITPY holds, code & libraries included
 THEME_SOUND = {
     # haunted house: three echoes off far walls, fading
     "halloween": "aecho=0.8:0.8:90|230|470:0.4|0.3|0.2",
+}
+
+# For the mailbox's surface exciter (ffmpeg filters): cut below ~150 Hz, which
+# it can't play, and lift 1-4 kHz (centred on 2 kHz, about 2 octaves wide)
+SPEAKER_EQ = "highpass=f=150:poles=2,equalizer=f=2000:t=q:w=0.7:g=4"
+
+# A theme's WAV effects: name -> (source in sounds_workshop, start s, length s
+# or None for all, loudness in LUFS as first cut, before the EQ)
+SFX = {
+    "halloween": {
+        "laugh": ("halloween_sfx_cc0/laugh-evil-1_0.ogg", 0, None, -20.8),
+        "laugh2": ("halloween_sfx_cc0/evil_laugh_02_0.ogg", 0, None, -15.8),
+        "cry": ("halloween_sfx_cc0/hungry-ghoul_0.ogg", 0, 4.4, -16.9),
+        "scream": ("halloween_sfx_cc0/scaryhighpitchedghost_0.ogg", 16.5, 4.0, -17.7),
+    },
 }
 
 
@@ -100,7 +121,27 @@ def loudnorm(source, start, length, extra=""):
     )
 
 
-def make_clip(row, out_dir, extra="", gain=0):
+def make_sfx(name, source, start, length, level, eq):
+    """Cut one WAV effect with the EQ, at the loudness it had before"""
+    clip = ["-ss", str(start)] + (["-t", str(length)] if length else [])
+    source = os.path.join(SOURCE_DIR, source)
+    before = "aformat=channel_layouts=mono,aresample=22050" + ("," + eq if eq else "")
+    measured = float(measure(source, start, length, before + ",")["input_i"])
+    filters = before + ",volume={:.1f}dB,alimiter=limit={:.1f}dB:level=disabled".format(
+        level - measured, PEAK
+    )
+    out = os.path.join(SOUNDS_DIR, name)
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-y"] + clip + [
+            "-i", source, "-af", filters, "-ac", "1", "-ar", "22050",
+            "-c:a", "pcm_s16le", "-map_metadata", "-1", out,
+        ],
+        check=True,
+    )
+    return out
+
+
+def make_clip(row, out_dir, extra="", gain=0, echo=False):
     """Cut one clip with ffmpeg; returns its file name
 
     gain (dB) corrects a clip that loudnorm left too quiet or loud; a limiter
@@ -109,7 +150,7 @@ def make_clip(row, out_dir, extra="", gain=0):
     start = seconds(row["start"])
     length = seconds(row["length"] or LENGTH)
     source = os.path.join(SOURCE_DIR, row["source"])
-    out_name = row["name"] + ("_echo" if extra else "") + "_22k.mp3"
+    out_name = row["name"] + ("_echo" if echo else "") + "_22k.mp3"
     filters = loudnorm(source, start, length, extra)
     if gain:
         filters += ",volume={:.1f}dB,alimiter=limit={:.1f}dB".format(gain, PEAK)
@@ -140,8 +181,22 @@ def main():
     parser.add_argument(
         "--dry", action="store_true", help="leave out the theme's own sound (echo)"
     )
+    parser.add_argument(
+        "--flat", action="store_true", help="leave out the speaker EQ"
+    )
+    parser.add_argument(
+        "--sfx", action="store_true", help="re-cut the theme's WAV effects instead"
+    )
     args = parser.parse_args()
-    extra = "" if args.dry else THEME_SOUND.get(args.theme, "")
+    eq = "" if args.flat else SPEAKER_EQ
+    if args.sfx:
+        for name, (source, start, length, level) in SFX.get(args.theme, {}).items():
+            out = make_sfx(os.path.join(args.theme, name + ".wav"),
+                           source, start, length, level, eq)
+            print("made {} ({:.1f} LUFS)".format(out, loudness(out)))
+        return
+    echo = "" if args.dry else THEME_SOUND.get(args.theme, "")
+    extra = ",".join(f for f in (eq, echo) if f)
     out_dir = os.path.join(SOUNDS_DIR, args.theme)
     os.makedirs(out_dir, exist_ok=True)
 
@@ -156,10 +211,10 @@ def main():
 
     made = []
     for row in rows:
-        name = make_clip(row, out_dir, extra)
+        name = make_clip(row, out_dir, extra, echo=bool(echo))
         level = loudness(os.path.join(out_dir, name))
         if abs(level - LOUDNESS) > CLOSE_ENOUGH:
-            name = make_clip(row, out_dir, extra, LOUDNESS - level)
+            name = make_clip(row, out_dir, extra, LOUDNESS - level, bool(echo))
             level = loudness(os.path.join(out_dir, name))
         made.append(name)
         print("made {} ({:.1f} LUFS)".format(name, level))
