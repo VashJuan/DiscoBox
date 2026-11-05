@@ -18,7 +18,7 @@ import time
 
 import synthio
 
-from config import verbose, theme_settings, sound_dir
+from config import verbose, theme_settings, sound_dir, volume
 from sound import MIXER_SAMPLE_RATE, MIXER_CHANNELS
 from creak import map_range, Recording
 
@@ -28,7 +28,7 @@ PITCH = (2500, 700)  # Hz at NEAR, FAR (was 1800, 500: John wanted it a bit high
 MOVE_CM = 3  # a reading this much different from the last counts as movement
 HOLD = 0.4  # seconds the whistle keeps playing after the last movement
 GLIDE = 0.15  # seconds to slide most of the way to a new pitch
-LEVEL = 0.5  # mixer volume
+LEVEL = 0.5 * volume  # mixer volume
 VIBRATO = theme_settings.WHISTLE_VIBRATO  # octaves of wobble; 0 = none
 VIBRATO_RATE = 5.5  # wobbles per second
 

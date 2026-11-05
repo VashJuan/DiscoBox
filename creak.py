@@ -22,7 +22,7 @@ import time
 import audiocore
 import synthio
 
-from config import verbose, sound_dir, theme_settings
+from config import verbose, sound_dir, theme_settings, volume
 from sound import MIXER_SAMPLE_RATE, MIXER_CHANNELS
 
 # Tuning: degrees per second of door swing
@@ -45,7 +45,7 @@ GLIDE = 0.15  # seconds for pitch & volume to settle on a new reading
 # Chimes while the door is still
 CHIME_GAP = (30, 50)  # seconds of stillness before each chime
 CHIME_LEVEL = 0.8
-RECORDING_LEVEL = 1.0  # mixer volume of recorded (WAV) chimes
+RECORDING_LEVEL = 1.0 * volume  # mixer volume of recorded (WAV) chimes
 
 
 def map_range(s, a1, a2, b1, b2):
@@ -453,7 +453,7 @@ class DoorCreak:
 
     def __init__(self, mixer, on_chime=None):
         self.voice = mixer.voice[1]
-        self.voice.level = 1
+        self.voice.level = volume
         self.synth = synthio.Synthesizer(
             channel_count=MIXER_CHANNELS, sample_rate=MIXER_SAMPLE_RATE
         )

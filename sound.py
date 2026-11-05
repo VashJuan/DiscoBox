@@ -18,7 +18,7 @@ import audiomixer
 import audiomp3
 import synthio
 
-from config import verbose, sound_dir, mp3files, theme
+from config import verbose, sound_dir, mp3files, theme, volume
 
 wav_file2 = "sounds/amenfull_22k_s16.wav"
 # in 'circuitpython-tricks/larger-tricks/breakbeat_wavs'
@@ -27,11 +27,16 @@ mp3_file2 = sound_dir + mp3files[0]
 
 MIXER_SAMPLE_RATE = 22050
 MIXER_CHANNELS = 1
+# Bytes of mixed audio queued for the I2S output. The default 1024 is only ~23 ms
+# at 22050 Hz mono, shorter than one MP3 frame's decode (~26 ms), so the music
+# stuttered whenever the loop or decoder ran long; 2048 is ~46 ms of slack
+# (4096 & 8192 ran out of memory loading creak.py).
+MIXER_BUFFER = 2048
 
 # Song volume; it ducks while the creak or whistle plays so they stand out
-SONG_LEVEL = 0.6
-DUCKED_LEVEL = 0.25
-SQUEAK_DUCKED_LEVEL = 0.08  # lower still while the door squeaks
+SONG_LEVEL = 0.6 * volume
+DUCKED_LEVEL = 0.25 * volume
+SQUEAK_DUCKED_LEVEL = 0.08 * volume  # lower still while the door squeaks
 DUCK_DOWN = 0.1  # seconds to fade the song down when an effect starts
 DUCK_UP = 0.8  # seconds to bring it back after the effects stop
 
@@ -53,6 +58,7 @@ def setup_audio(test_clips=True):
         sample_rate=MIXER_SAMPLE_RATE,
         bits_per_sample=16,
         samples_signed=True,
+        buffer_size=MIXER_BUFFER,
     )
     audio.play(mixer)  # attach mixer to audio playback
     mixer.voice[0].level = SONG_LEVEL

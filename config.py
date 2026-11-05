@@ -36,3 +36,13 @@ mp3files = read_playlist()
 door_creak = True  # cartoon creak over the song as the door swings (creak.py)
 slide_whistle = True  # tone that follows the distance sensor as mail moves (whistle.py)
 music_lights = True  # panel brightness pulses with the song (lights.MusicPulse)
+
+volume = 0.5  # master volume for songs & effects (1 = full)
+
+# Sensors can be switched off to chase stutters in the music (each I2C read
+# takes time from the MP3 decoder). Off = never set up or polled.
+distance_sensor = False  # VL53L1X: the slide whistle / beam sounds
+accelerometer = False  # LIS3DH on the Prop-Maker: door creak & chimes
+
+# Print any loop pass slower than this (ms) to the serial port, even in production
+slow_tick_ms = 60

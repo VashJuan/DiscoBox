@@ -28,6 +28,9 @@ from config import (
     door_creak,
     slide_whistle,
     music_lights,
+    distance_sensor,
+    accelerometer,
+    slow_tick_ms,
     theme,
     theme_settings,
 )
@@ -85,16 +88,23 @@ def connect_tof():
         return None
 
 
-vl53 = connect_tof()
-if vl53 is None:
-    print("No distance sensor: the show goes on without the whistle")
+vl53 = None
+if distance_sensor:
+    vl53 = connect_tof()
+    if vl53 is None:
+        print("No distance sensor: the show goes on without the whistle")
+else:
+    print("Distance sensor switched off in config.py")
 prop_servo = ServoSweep()
 animations, pixels = lights.setup_animations()
-try:
-    lis3dh = sensors.setup_accelerometer()
-except (ValueError, OSError, RuntimeError) as error:
-    print("No accelerometer: the show goes on without the door sounds:", error)
-    lis3dh = None
+lis3dh = None
+if accelerometer:
+    try:
+        lis3dh = sensors.setup_accelerometer()
+    except (ValueError, OSError, RuntimeError) as error:
+        print("No accelerometer: the show goes on without the door sounds:", error)
+else:
+    print("Accelerometer switched off in config.py")
 timing("sensors, servo & lights set up")
 
 lightning = lights.Lightning(pixels) if theme_settings.LIGHTNING else None
@@ -129,7 +139,7 @@ def tick():
 
     # -----------------
     # region Measure distance
-    if vl53 is None and time.monotonic() - tof_tried > TOF_RETRY:
+    if distance_sensor and vl53 is None and time.monotonic() - tof_tried > TOF_RETRY:
         vl53 = connect_tof()
         if vl53:
             print("Distance sensor found")
@@ -196,10 +206,16 @@ def tick():
     prop_servo.step()
 
 
+slow_ticks = 0
 while True:
     # This allows you to do other things while the audio plays!
     while song.playing:
+        started = time.monotonic_ns()
         tick()
+        took = (time.monotonic_ns() - started) // 1_000_000
+        if took > slow_tick_ms:
+            slow_ticks += 1
+            print("Slow tick #{}: {} ms".format(slow_ticks, took))
     song_index = (song_index + 1) % len(mp3files)
     song = sound.play_song(audio, mixer, song_decoder, mp3files[song_index])
     sound.remember_next_song(song_index)
