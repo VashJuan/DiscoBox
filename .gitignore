@@ -4,7 +4,9 @@
 
 # personnel info
 
-# compiled output
+# compiled output (deploy.ps1 builds .mpy with tools\bin\mpy-cross.exe)
+/build/
+/tools/bin/
 
 # dependencies
 

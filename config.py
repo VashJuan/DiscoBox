@@ -44,8 +44,8 @@ led_max = 0.75 if outdoors else 0.25  # panel brightness on the loudest beats
 
 # Sensors can be switched off to chase stutters in the music (each I2C read
 # takes time from the MP3 decoder). Off = never set up or polled.
-distance_sensor = False  # VL53L1X: the slide whistle / beam sounds
-accelerometer = False  # LIS3DH on the Prop-Maker: door creak & chimes
+distance_sensor = True  # VL53L1X: the slide whistle / beam sounds
+accelerometer = True  # LIS3DH on the Prop-Maker: door creak & chimes
 
 # Print any loop pass slower than this (ms) to the serial port, even in production
 slow_tick_ms = 60

@@ -89,9 +89,27 @@ foreach ($name in $wanted) {
 }
 
 # 3. code, themes & libraries
-$code = "main.py", "config.py", "sensors.py", "lights.py", "prop_servo.py",
-    "sound.py", "creak.py", "whistle.py"
+# main.py & config.py stay source (deploy edits config.py on the board). The
+# other modules go as precompiled .mpy: compiling .py on the board needs RAM
+# the show doesn't have (MemoryError importing creak.py, 2026-11-05).
+# mpy-cross must match the board's CircuitPython (10.3.1):
+# https://adafruit-circuit-python.s3.amazonaws.com/bin/mpy-cross/windows/
+$code = "main.py", "config.py"
+$modules = "sensors", "lights", "prop_servo", "sound", "creak", "whistle"
 foreach ($name in $code) { Copy-IfChanged (Join-Path $repo $name) (Join-Path $board $name) }
+$mpyCross = Join-Path $PSScriptRoot "bin\mpy-cross.exe"
+if (-not (Test-Path $mpyCross)) { throw "No $mpyCross. Download mpy-cross 10.3.1 for Windows to there." }
+$build = Join-Path $repo "build"
+New-Item -ItemType Directory -Force $build | Out-Null
+foreach ($name in $modules) {
+    $mpy = Join-Path $build "$name.mpy"
+    & $mpyCross -o $mpy (Join-Path $repo "$name.py")
+    if ($LASTEXITCODE) { throw "mpy-cross failed on $name.py" }
+    # a .py on the board is found before the .mpy, so remove it
+    $oldPy = Join-Path $board "$name.py"
+    if (Test-Path $oldPy) { Write-Host "remove $name.py"; Remove-Item $oldPy }
+    Copy-IfChanged $mpy (Join-Path $board "$name.mpy")
+}
 New-Item -ItemType Directory -Force (Join-Path $board "themes") | Out-Null
 Get-ChildItem (Join-Path $repo "themes") -Filter *.py | ForEach-Object {
     Copy-IfChanged $_.FullName (Join-Path $board "themes\$($_.Name)")
