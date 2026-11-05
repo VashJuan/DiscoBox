@@ -94,6 +94,6 @@
   17 wind, 18 thunder), and `test_lights.py` for the 11 animations. Do the
   rain and leaves fall down, not up (else `TOP_ROW = 7` in lights.py)? Is
   the synth thunder convincing, or should we find a CC0 thunder & rain
-  recording? The 19 songs are all from D:\\Muzak (list & start times in
+  recording? The 19 songs are all from D:\Muzak (list & start times in
   tools/songs.xlsx): any to drop or swap? Starts are each song's loudest
   minute; Riders on the Storm starts from the top (the rain intro).
