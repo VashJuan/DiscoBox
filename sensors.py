@@ -39,10 +39,9 @@ def setup_tof(i2c):
     return vl53
 
 
-def setup_accelerometer():
-    """Onboard i2c LIS3DH accelerometer"""
+def setup_accelerometer(i2c):
+    """Onboard i2c LIS3DH accelerometer (same bus as the STEMMA QT connector)"""
     # https://learn.adafruit.com/adafruit-lis3dh-triple-axis-accelerometer-breakout
-    i2c = board.I2C()
     int1 = DigitalInOut(board.ACCELEROMETER_INTERRUPT)
     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
     # https://learn.adafruit.com/adafruit-lis3dh-triple-axis-accelerometer-breakout/arduino#accelerometer-ranges-1729247

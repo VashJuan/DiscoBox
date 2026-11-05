@@ -19,6 +19,7 @@
 import time
 
 import board
+import busio
 from digitalio import DigitalInOut
 
 from config import (
@@ -31,6 +32,7 @@ from config import (
     distance_sensor,
     accelerometer,
     slow_tick_ms,
+    i2c_khz,
     theme,
     theme_settings,
 )
@@ -71,7 +73,9 @@ timing("libraries imported")
 # Set up the hardware
 # The show goes on if a sensor is missing or drops out: the servo, NeoPixels
 # & speaker are outputs that never fail when unplugged, but the I2C sensors raise
-i2c = board.STEMMA_I2C()  # Use built-in STEMMA QT connector on RP2040
+# One bus for the STEMMA QT connector & the onboard accelerometer, slowed to
+# i2c_khz so a long cable to the distance sensor still works
+i2c = busio.I2C(board.SCL, board.SDA, frequency=i2c_khz * 1000)
 TOF_RETRY = 5  # seconds between tries to find a missing distance sensor
 tof_tried = 0
 
@@ -100,7 +104,7 @@ animations, pixels = lights.setup_animations()
 lis3dh = None
 if accelerometer:
     try:
-        lis3dh = sensors.setup_accelerometer()
+        lis3dh = sensors.setup_accelerometer(i2c)
     except (ValueError, OSError, RuntimeError) as error:
         print("No accelerometer: the show goes on without the door sounds:", error)
 else:
